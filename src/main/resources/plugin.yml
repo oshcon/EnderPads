@@ -1,0 +1,42 @@
+name: ${project.artifactId}
+version: ${project.version}
+authors: [oshcon]
+softdepend: [Essentials, SuperVanish, PremiumVanish]
+website: http://doodcraft.net/
+main: net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin
+
+commands:
+  enderpads:
+    description: Base command
+
+permissions:
+  enderpads.*:
+    description: Grants all plugin permission nodes
+    default: OP
+  enderpads.command.enderpads:
+    description: Allows players to use /enderpads
+    default: OP
+  enderpads.command.reload:
+    description: Allows players to use /enderpads reload
+    default: OP
+  enderpads.use:
+    description: Allows players to use and construct EnderPads
+    default: true
+  enderpads.seeinfo:
+    description: Allows players to see information of own EnderPads
+    default: true
+  enderpads.seeinfo.owner:
+    description: Allows players to additionally see the EnderPads owner
+    default: true
+  enderpads.seeinfo.others:
+    description: Allows players to see others EnderPads information
+    default: true
+  enderpads.alerts:
+    description: Players will receive create and destroy alerts for EnderPads
+    default: true
+  enderpads.max.2:
+    description: Allows players to construct a number of EnderPads
+    default: true
+  enderpads.max.*:
+    description: Allows players to construct unlimited EnderPads
+    default: OP
