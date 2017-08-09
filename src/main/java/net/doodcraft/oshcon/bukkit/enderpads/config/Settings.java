@@ -2,6 +2,7 @@ package net.doodcraft.oshcon.bukkit.enderpads.config;
 
 import net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin;
 import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPadAPI;
+import net.doodcraft.oshcon.bukkit.enderpads.util.Compatibility;
 import net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods;
 import org.bukkit.Bukkit;
 
@@ -9,8 +10,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Settings
-{
+public class Settings {
     public static String version;
     public static Boolean colorfulLogging;
     public static Boolean debug;
@@ -21,9 +21,20 @@ public class Settings
     public static List<String> blackListedWorlds;
     public static Boolean safeTeleport;
     public static int playerCooldown;
+
+    // EFFECTS
     public static Boolean lightningCreate;
     public static Boolean lightningDestroy;
     public static Boolean lightningUse;
+    public static Boolean idleParticles;
+    public static Boolean potionEffectsEnabled;
+    public static List<String> potionEffects;
+    public static Boolean warpParticlesOrigin;
+    public static Boolean warpParticlesDestination;
+    public static Boolean soundsFrom;
+    public static Boolean soundsTo;
+    public static String soundFrom;
+    public static String soundTo;
 
     public static String pluginPrefix;
     public static String noPermission;
@@ -44,8 +55,7 @@ public class Settings
     public static String online;
     public static String offline;
 
-    public static void setupDefaults()
-    {
+    public static void setupDefaults() {
         colorfulLogging = true;
         debug = false;
         logUse = true;
@@ -59,9 +69,26 @@ public class Settings
         blackListedWorlds.add("another_disabled_world");
         safeTeleport = true;
         playerCooldown = 6;
+
+        // EFFECTS
         lightningCreate = true;
         lightningDestroy = true;
         lightningUse = false;
+        idleParticles = true;
+        potionEffectsEnabled = true;
+        potionEffects = new ArrayList<>();
+        potionEffects.add("CONFUSION-6-1-false-false");
+        warpParticlesOrigin = true;
+        warpParticlesDestination = true;
+        soundsFrom = true;
+        soundsTo = true;
+        if (Compatibility.isSupported(EnderPadsPlugin.version, "1.9", "2.0")) {
+            soundFrom = "ENTITY_ENDERMEN_TELEPORT-1-1.35";
+            soundTo = "ENTITY_ENDERMEN_TELEPORT-1-1.45";
+        } else {
+            soundFrom = "ENDERMAN_TELEPORT-1-1.35";
+            soundTo = "ENDERMAN_TELEPORT-1-1.45";
+        }
 
         pluginPrefix = "&8[&5EnderPads&8]&r";
         noPermission = "<prefix> &cNo permission.";
@@ -94,9 +121,20 @@ public class Settings
         config.add("CenterMaterial", centerMaterial);
         config.add("Blacklist.Materials", blackListedBlocks);
         config.add("Blacklist.Worlds", blackListedWorlds);
+
+        // EFFECTS
         config.add("Effects.Lightning.OnCreate", lightningCreate);
         config.add("Effects.Lightning.OnDestroy", lightningDestroy);
         config.add("Effects.Lightning.OnUse", lightningUse);
+        config.add("Effects.IdleParticles", idleParticles);
+        config.add("Effects.PotionEffects.Enabled", potionEffectsEnabled);
+        config.add("Effects.PotionEffects.List", potionEffects);
+        config.add("Effects.OnUse.Origin", warpParticlesOrigin);
+        config.add("Effects.OnUse.Destination", warpParticlesDestination);
+        config.add("Effects.Sounds.From.Enabled", soundsFrom);
+        config.add("Effects.Sounds.From.Sound", soundFrom);
+        config.add("Effects.Sounds.To.Enabled", soundsTo);
+        config.add("Effects.Sounds.To.Sound", soundTo);
 
         locale.add("General.PluginPrefix", pluginPrefix);
         locale.add("General.NoPermission", noPermission);
@@ -126,8 +164,7 @@ public class Settings
         update();
     }
 
-    private static void setNewConfigValues(Configuration config)
-    {
+    private static void setNewConfigValues(Configuration config) {
         version = config.getString("General.Version");
         colorfulLogging = config.getBoolean("General.ColorfulLogging");
         debug = config.getBoolean("General.DebugMessages");
@@ -138,13 +175,23 @@ public class Settings
         centerMaterial = config.getString("CenterMaterial");
         blackListedBlocks = config.getStringList("Blacklist.Materials");
         blackListedWorlds = config.getStringList("Blacklist.Worlds");
+
+        // EFFECTS
         lightningCreate = config.getBoolean("Effects.Lightning.OnCreate");
         lightningDestroy = config.getBoolean("Effects.Lightning.OnDestroy");
         lightningUse = config.getBoolean("Effects.Lightning.OnUse");
+        idleParticles = config.getBoolean("Effects.IdleParticles");
+        potionEffectsEnabled = config.getBoolean("Effects.PotionEffects.Enabled");
+        potionEffects = config.getStringList("Effects.PotionEffects.List");
+        warpParticlesOrigin = config.getBoolean("Effects.OnUse.Origin");
+        warpParticlesDestination = config.getBoolean("Effects.OnUse.Destination");
+        soundsFrom = config.getBoolean("Effects.Sounds.From.Enabled");
+        soundFrom = config.getString("Effects.Sounds.From.Sound");
+        soundsTo = config.getBoolean("Effects.Sounds.To.Enabled");
+        soundTo = config.getString("Effects.Sounds.To.Sound");
     }
 
-    private static void setNewLocaleValues(Configuration locale)
-    {
+    private static void setNewLocaleValues(Configuration locale) {
         pluginPrefix = locale.getString("General.PluginPrefix");
         noPermission = locale.getString("General.NoPermission");
         reloadSuccess = locale.getString("General.Reload.Success");
@@ -165,15 +212,12 @@ public class Settings
         offline = locale.getString("Variables.Offline");
     }
 
-    public static boolean reload()
-    {
+    public static boolean reload() {
         ConfigurationReloadEvent event = new ConfigurationReloadEvent(EnderPadsPlugin.plugin);
         Bukkit.getPluginManager().callEvent(event);
 
-        if (!event.isCancelled())
-        {
-            try
-            {
+        if (!event.isCancelled()) {
+            try {
                 Configuration config = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "config.yml");
                 Configuration locale = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "locale.yml");
 
@@ -182,43 +226,33 @@ public class Settings
 
                 EnderPadAPI.verifyAllTelepads();
                 return false;
-            } catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 ex.printStackTrace();
                 return true;
             }
-        }
-        else
-        {
+        } else {
             StaticMethods.debug("ConfigurationReloadEvent was cancelled.");
             return false;
         }
     }
 
-    private static void update()
-    {
+    private static void update() {
         String version = EnderPadsPlugin.plugin.getDescription().getVersion();
 
         Configuration config = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "config.yml");
         Configuration locale = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "locale.yml");
 
         // 0.3.2-beta, the first config update. Check if General.Version is null to determine if it is needed.
-        if (config.getString("General.Version") == null)
-        {
-            StaticMethods.log("&eLocale changes have been made in 0.3.2-beta requiring an update to locale.yml.");
-            StaticMethods.log("&eThese changes will be applied now.");
-            try
-            {
+        if (config.getString("General.Version") == null) {
+            try {
                 noPermission = locale.getString("General.NoPermission");
                 atMaximum = locale.getString("AtMaximum");
 
-                if (!locale.getString("General.NoPermission").toLowerCase().contains("<prefix>"))
-                {
+                if (!locale.getString("General.NoPermission").toLowerCase().contains("<prefix>")) {
                     locale.set("General.NoPermission", "<prefix> " + locale.getString("General.NoPermission"));
                 }
 
-                if (!locale.getString("AtMaximum").toLowerCase().contains("<prefix>"))
-                {
+                if (!locale.getString("AtMaximum").toLowerCase().contains("<prefix>")) {
                     locale.set("AtMaximum", "<prefix> " + locale.getString("AtMaximum"));
                 }
 
@@ -229,17 +263,17 @@ public class Settings
 
                 setNewLocaleValues(locale);
                 setNewConfigValues(config);
-            } catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 ex.printStackTrace();
                 StaticMethods.log("&cThere was an error updating your locale to reflect the 0.3.2-beta changes.");
                 StaticMethods.log("&cIf possible, create backups, delete your locale.yml file, then restart.");
             }
         }
 
-        if (!config.getString("General.Version").equals(version))
-        {
+        if (!config.getString("General.Version").equals(version)) {
             // Post 0.3.2-beta updates will be performed here.
+            // REMINDER:
+            // Config/Locale updates changes should be kept to a minimum to decrease general confusion for users.
             config.set("General.Version", version);
             config.save();
 

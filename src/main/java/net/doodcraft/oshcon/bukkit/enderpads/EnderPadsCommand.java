@@ -1,39 +1,59 @@
 package net.doodcraft.oshcon.bukkit.enderpads;
 
-import net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods;
+import net.doodcraft.oshcon.bukkit.enderpads.config.Configuration;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
+import net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods;
 import net.doodcraft.oshcon.bukkit.enderpads.util.StringParser;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class EnderPadsCommand implements CommandExecutor
-{
+import java.io.File;
+import java.util.List;
+
+public class EnderPadsCommand implements CommandExecutor {
+    private double calculateAverage(List<Long> times) {
+        Long sum = 0L;
+        if (!times.isEmpty()) {
+            for (Long time : times) {
+                sum += time;
+            }
+            return sum.doubleValue() / times.size();
+        }
+        return sum;
+    }
+
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
-    {
-        if (label.equalsIgnoreCase("enderpads"))
-        {
-            if (sender instanceof Player)
-            {
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (label.equalsIgnoreCase("enderpads")) {
+            if (sender instanceof Player) {
                 Player player = (Player) sender;
 
-                if (!StaticMethods.hasPermission(player, "enderpads.command.enderpads", true))
-                {
+                // Debugging command.
+                if (args[0].equalsIgnoreCase("dev")) {
+                    Configuration pads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
+                    Configuration linkedPads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "linked.yml");
+                    Configuration players = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "players.yml");
+                    sender.sendMessage("Version: " + EnderPadsPlugin.plugin.getDescription().getVersion());
+                    sender.sendMessage("EnderPads: " + pads.getKeys(false).size());
+                    sender.sendMessage("Create: "); // average
+                    sender.sendMessage("Destroy: "); // average
+                    sender.sendMessage("Use: "); // average
+                    return true;
+                }
+
+                if (!StaticMethods.hasPermission(player, "enderpads.command.enderpads", true)) {
                     return false;
                 }
 
-                if (args.length == 0)
-                {
+                if (args.length == 0) {
                     sendValidCommands(sender);
                     return true;
                 }
 
-                if (args[0].equalsIgnoreCase("reload"))
-                {
-                    if (!StaticMethods.hasPermission(player, "enderpads.command.reload", true))
-                    {
+                if (args[0].equalsIgnoreCase("reload")) {
+                    if (!StaticMethods.hasPermission(player, "enderpads.command.reload", true)) {
                         return false;
                     }
 
@@ -45,17 +65,13 @@ public class EnderPadsCommand implements CommandExecutor
                 player.sendMessage(StaticMethods.addColor(Settings.pluginPrefix + "&cIncorrect subcommand."));
                 sendValidCommands(sender);
                 return false;
-            }
-            else
-            {
-                if (args.length == 0)
-                {
+            } else {
+                if (args.length == 0) {
                     sendValidCommands(sender);
                     return true;
                 }
 
-                if (args[0].equalsIgnoreCase("reload"))
-                {
+                if (args[0].equalsIgnoreCase("reload")) {
                     boolean error = Settings.reload();
                     sendReloaded(error, sender);
                     return true;
@@ -66,43 +82,29 @@ public class EnderPadsCommand implements CommandExecutor
         return false;
     }
 
-    public static void sendReloaded(boolean error, CommandSender sender)
-    {
-        if (!error)
-        {
-            if (sender instanceof Player)
-            {
+    public static void sendReloaded(boolean error, CommandSender sender) {
+        if (!error) {
+            if (sender instanceof Player) {
                 sender.sendMessage(StringParser.parse(Settings.reloadSuccess, null, null, null, false, false));
                 StaticMethods.log("&aPlugin reloaded!");
-            }
-            else
-            {
+            } else {
                 StaticMethods.log("&aPlugin reloaded!");
             }
-        }
-        else
-        {
-            if (sender instanceof Player)
-            {
+        } else {
+            if (sender instanceof Player) {
                 sender.sendMessage(StringParser.parse(Settings.reloadFailed, null, null, null, false, false));
                 StaticMethods.log("&cError reloading plugin!");
-            }
-            else
-            {
+            } else {
                 StaticMethods.log("&cError reloading plugin!");
             }
         }
     }
 
-    public static void sendValidCommands(CommandSender sender)
-    {
-        if (sender instanceof Player)
-        {
+    public static void sendValidCommands(CommandSender sender) {
+        if (sender instanceof Player) {
             sender.sendMessage(StaticMethods.addColor(Settings.pluginPrefix + " &3Valid Commands:"));
             sender.sendMessage(StaticMethods.addColor(Settings.pluginPrefix + " &b/enderpads reload: &7Reloads the config and verifies all pad data"));
-        }
-        else
-        {
+        } else {
             StaticMethods.log("&3Valid Commands:");
             StaticMethods.log("&b/enderpads reload: &7Reloads the config and verifies all pad data");
         }

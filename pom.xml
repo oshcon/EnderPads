@@ -4,7 +4,7 @@
 
     <groupId>net.doodcraft</groupId>
     <artifactId>EnderPads</artifactId>
-    <version>0.3.2-beta</version>
+    <version>0.3.3-beta</version>
 
     <build>
         <finalName>${project.artifactId}-${project.version}</finalName>
@@ -79,8 +79,8 @@
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
         <repository>
-            <id>destroystokyo-repo</id>
-            <url>https://repo.destroystokyo.com/repository/maven-snapshots/</url>
+            <id>elmakers-repo</id>
+            <url>http://maven.elmakers.com/repository/</url>
         </repository>
         <repository>
             <id>bstats-repo</id>
@@ -92,33 +92,25 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.11.1-R0.1-SNAPSHOT</version>
+            <version>1.12.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.11.1-R0.1-SNAPSHOT</version>
+            <version>1.12.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.slikey</groupId>
+            <artifactId>EffectLib</artifactId>
+            <version>5.5-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
             <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.earth2me</groupId>
-            <artifactId>Essentials</artifactId>
-            <version>2.0.1</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/EssentialsX-2.0.1.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>de.myzelyam</groupId>
-            <artifactId>SuperVanish</artifactId>
-            <version>5.9.5</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/SuperVanish-5.9.5.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

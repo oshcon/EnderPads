@@ -1,7 +1,6 @@
 name: ${project.artifactId}
 version: ${project.version}
 authors: [oshcon]
-softdepend: [Essentials, SuperVanish, PremiumVanish]
 website: http://doodcraft.net/
 main: net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin
 

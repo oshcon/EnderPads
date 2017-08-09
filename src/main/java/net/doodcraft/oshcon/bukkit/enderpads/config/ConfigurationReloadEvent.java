@@ -4,30 +4,25 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 
-public class ConfigurationReloadEvent extends Event
-{
+public class ConfigurationReloadEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
 
     private Plugin plugin;
     private boolean cancelled;
 
-    public ConfigurationReloadEvent(Plugin plugin)
-    {
+    public ConfigurationReloadEvent(Plugin plugin) {
         this.plugin = plugin;
     }
 
-    public boolean isCancelled()
-    {
+    public boolean isCancelled() {
         return cancelled;
     }
 
-    public Plugin getPlugin()
-    {
+    public Plugin getPlugin() {
         return plugin;
     }
 
-    public void setCancelled(boolean cancelled)
-    {
+    public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
     }
 

@@ -8,25 +8,20 @@ import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
-public class EntityListener implements Listener
-{
+public class EntityListener implements Listener {
     @EventHandler(ignoreCancelled = true)
-    public void onChange(EntityChangeBlockEvent event)
-    {
+    public void onChange(EntityChangeBlockEvent event) {
         EnderPadAPI.runTelepadCheck(event.getBlock(), false);
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onChange(EntityBlockFormEvent event)
-    {
+    public void onChange(EntityBlockFormEvent event) {
         EnderPadAPI.runTelepadCheck(event.getBlock(), false);
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onExplosion(EntityExplodeEvent event)
-    {
-        for (Block block : event.blockList())
-        {
+    public void onExplosion(EntityExplodeEvent event) {
+        for (Block block : event.blockList()) {
             EnderPadAPI.destroyCheck(block, null);
         }
     }

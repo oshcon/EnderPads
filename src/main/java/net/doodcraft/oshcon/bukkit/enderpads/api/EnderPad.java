@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class EnderPad
-{
+public class EnderPad {
+
     private String padId;
     private String linkId;
     private UUID ownerUUID;
@@ -31,13 +31,11 @@ public class EnderPad
     private Block southBlock;
     private Block westBlock;
 
-    public EnderPad(Location location)
-    {
+    public EnderPad(Location location) {
         setLocation(location);
         setPadId();
 
-        if (isSaved())
-        {
+        if (isSaved()) {
             Configuration pads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
             ownerUUID = UUID.fromString(pads.getString(getPadId() + ".Owner.UUID"));
         }
@@ -45,197 +43,158 @@ public class EnderPad
         setAllSides(location);
     }
 
-    public EnderPad(Location location, Player player)
-    {
+    public EnderPad(Location location, Player player) {
         setLocation(location);
         setPadId();
         setOwnerUUID(player);
         setAllSides(location);
     }
 
-    public void setPadId()
-    {
+    public void setPadId() {
         padId = String.valueOf(padLocation.getWorld().getName() + " " + ((int) padLocation.getX()) + " " + (int) padLocation.getY() + " " + (int) padLocation.getZ());
     }
 
-    public void setLinkId(String id)
-    {
+    public void setLinkId(String id) {
         linkId = id;
     }
 
-    public void setLinkId(Block blocks[])
-    {
+    public void setLinkId(Block blocks[]) {
         List<String> blockNames = new ArrayList<>();
 
-        for (Block block : blocks)
-        {
+        for (Block block : blocks) {
             blockNames.add(EnderPadAPI.getBlockString(block));
         }
 
         blockNames.sort(Collator.getInstance());
-
         linkId = String.join("-", blockNames);
     }
 
-    public void setOwnerUUID(Player player)
-    {
+    public void setOwnerUUID(Player player) {
         ownerUUID = player.getUniqueId();
     }
 
-    public void setLocation(Location location)
-    {
+    public void setLocation(Location location) {
         padLocation = location;
     }
 
-    public void setCenterBlock(Block block)
-    {
+    public void setCenterBlock(Block block) {
         centerBlock = block;
     }
 
-    public void setNorthBlock(Block block)
-    {
+    public void setNorthBlock(Block block) {
         northBlock = block;
     }
 
-    public void setEastBlock(Block block)
-    {
+    public void setEastBlock(Block block) {
         eastBlock = block;
     }
 
-    public void setSouthBlock(Block block)
-    {
+    public void setSouthBlock(Block block) {
         southBlock = block;
     }
 
-    public void setWestBlock(Block block)
-    {
+    public void setWestBlock(Block block) {
         westBlock = block;
     }
 
-    public void setAllSides(Location location)
-    {
+    public void setAllSides(Location location) {
         Block block = location.getBlock();
         setCenterBlock(block);
 
-        for (BlockFace face : EnderPadsPlugin.faces)
-        {
+        for (BlockFace face : EnderPadsPlugin.faces) {
             Block sideBlock = getCenterBlock().getRelative(face);
-
-            if (!sideBlock.isEmpty() && !sideBlock.isLiquid())
-            {
+            if (!sideBlock.isEmpty() && !sideBlock.isLiquid()) {
                 Material material = sideBlock.getType();
 
-                if (Settings.blackListedBlocks.contains(material.toString().toUpperCase()))
-                {
+                if (Settings.blackListedBlocks.contains(material.toString().toUpperCase())) {
                     break;
                 }
 
-                if (!material.isBlock() || !material.isSolid() || !material.isOccluding() || material.isTransparent())
-                {
+                if (!material.isBlock() || !material.isSolid() || !material.isOccluding() || material.isTransparent()) {
                     break;
                 }
 
-                if (face.equals(BlockFace.NORTH))
-                {
+                if (face.equals(BlockFace.NORTH)) {
                     setNorthBlock(sideBlock);
                 }
 
-                if (face.equals(BlockFace.EAST))
-                {
+                if (face.equals(BlockFace.EAST)) {
                     setEastBlock(sideBlock);
                 }
 
-                if (face.equals(BlockFace.SOUTH))
-                {
+                if (face.equals(BlockFace.SOUTH)) {
                     setSouthBlock(sideBlock);
                 }
 
-                if (face.equals(BlockFace.WEST))
-                {
+                if (face.equals(BlockFace.WEST)) {
                     setWestBlock(sideBlock);
                 }
-            }
-            else
-            {
+            } else {
                 break;
             }
         }
     }
 
-    public String getPadId()
-    {
+    public String getPadId() {
         return padId;
     }
 
-    public String getLinkId()
-    {
+    public String getLinkId() {
         return linkId;
     }
 
-    public UUID getOwnerUUID()
-    {
+    public UUID getOwnerUUID() {
         return ownerUUID;
     }
 
-    public Location getLocation()
-    {
+    public Location getLocation() {
         return padLocation;
     }
 
-    public Block getCenterBlock()
-    {
+    public Block getCenterBlock() {
         return centerBlock;
     }
 
-    public Block getNorthBlock()
-    {
+    public Block getNorthBlock() {
         return northBlock;
     }
 
-    public Block getEastBlock()
-    {
+    public Block getEastBlock() {
         return eastBlock;
     }
 
-    public Block getSouthBlock()
-    {
+    public Block getSouthBlock() {
         return southBlock;
     }
-    public Block getWestBlock()
-    {
+
+    public Block getWestBlock() {
         return westBlock;
     }
 
-    public String getOwnerName()
-    {
+    public String getOwnerName() {
         return Bukkit.getOfflinePlayer(this.ownerUUID).getName();
     }
 
-    public List<EnderPad> getLinkedPads()
-    {
+    public List<EnderPad> getLinkedPads() {
         Configuration linkedPads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "linked.yml");
         List<String> list = linkedPads.getStringList(padId);
         List<EnderPad> links = new ArrayList<>();
 
-        for (String s : list)
-        {
+        for (String s : list) {
             links.add(EnderPadAPI.getPadFromID(s));
         }
 
         return links;
     }
 
-    public Block[] getSideBlocks()
-    {
+    public Block[] getSideBlocks() {
         return new Block[]{northBlock, eastBlock, southBlock, westBlock};
     }
 
-    public boolean isValid()
-    {
+    public boolean isValid() {
         Block blocks[] = getSideBlocks();
 
-        for (Block block : blocks)
-        {
+        for (Block block : blocks) {
             if (block == null) {
                 return false;
             }
@@ -243,78 +202,63 @@ public class EnderPad
 
         setLinkId(blocks);
 
-        if (padId == null)
-        {
+        if (padId == null) {
             return false;
         }
 
-        if (ownerUUID == null)
-        {
+        if (ownerUUID == null) {
             return false;
         }
 
-        if (padLocation == null)
-        {
+        if (padLocation == null) {
             return false;
         }
 
-        if (centerBlock == null)
-        {
+        if (centerBlock == null) {
             return false;
         }
 
-        if (!EnderPadAPI.isValidPlate(centerBlock.getRelative(BlockFace.UP).getType()))
-        {
+        if (!EnderPadAPI.isValidPlate(centerBlock.getRelative(BlockFace.UP).getType())) {
             return false;
         }
 
         String check = EnderPadAPI.getBlockString(getCenterBlock());
         String valid = Settings.centerMaterial.toUpperCase();
 
-        if (!check.equals(valid))
-        {
+        if (!check.equals(valid)) {
             return false;
         }
 
         return linkId != null;
     }
 
-    public boolean isSaved()
-    {
+    public boolean isSaved() {
         Configuration pads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
         return pads.contains(padId);
     }
 
-    public void save()
-    {
-        if (ownerUUID != null)
-        {
+    public void save() {
+        if (ownerUUID != null) {
             Configuration pads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
             Configuration linkedPads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "linked.yml");
             Configuration players = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "players.yml");
 
             List<String> owned = players.getStringList(getOwnerUUID().toString());
 
-            if (Bukkit.getPlayer(ownerUUID) != null)
-            {
+            if (Bukkit.getPlayer(ownerUUID) != null) {
                 EnderPadCreateEvent createEvent = new EnderPadCreateEvent(this, Bukkit.getPlayer(ownerUUID));
                 Bukkit.getServer().getPluginManager().callEvent(createEvent);
 
-                if (!createEvent.isCancelled())
-                {
-                    if (owned.size() + 1 > EnderPadAPI.getMaxPads(Bukkit.getPlayer(ownerUUID)))
-                    {
+                if (!createEvent.isCancelled()) {
+                    if (owned.size() + 1 > EnderPadAPI.getMaxPads(Bukkit.getPlayer(ownerUUID))) {
                         Bukkit.getPlayer(ownerUUID).sendMessage(StringParser.parse(Settings.atMaximum, null, null, null, false, false));
                         return;
                     }
-                    if (owned.isEmpty())
-                    {
+                    if (owned.isEmpty()) {
                         owned.add(getPadId());
                         players.add(getOwnerUUID().toString(), owned);
                         players.save();
-                    }
-                    else
-                    {
+                    } else {
                         owned.add(getPadId());
                         players.remove(getOwnerUUID().toString());
                         players.add(getOwnerUUID().toString(), owned);
@@ -333,14 +277,11 @@ public class EnderPad
 
                     List<String> links = linkedPads.getStringList(linkId);
 
-                    if (links.isEmpty())
-                    {
+                    if (links.isEmpty()) {
                         links.add(getPadId());
                         linkedPads.add(getLinkId(), links);
                         linkedPads.save();
-                    }
-                    else
-                    {
+                    } else {
                         links.add(getPadId());
                         linkedPads.remove(getLinkId());
                         linkedPads.add(getLinkId(), links);
@@ -349,22 +290,18 @@ public class EnderPad
 
                     Player owner = Bukkit.getPlayer(ownerUUID);
 
-                    if (StaticMethods.hasPermission(owner, "enderpads.alerts", false))
-                    {
+                    if (StaticMethods.hasPermission(owner, "enderpads.alerts", false)) {
                         owner.sendMessage(StringParser.parse(Settings.created, null, this, null, false, false));
                     }
 
-                    if (StaticMethods.hasPermission(owner, "enderpads.seeinfo", false))
-                    {
-                        if (!StaticMethods.hasPermission(owner, "enderpads.alerts", false))
-                        {
+                    if (StaticMethods.hasPermission(owner, "enderpads.seeinfo", false)) {
+                        if (!StaticMethods.hasPermission(owner, "enderpads.alerts", false)) {
                             owner.sendMessage(StringParser.parse(Settings.enderPadCreated, null, this, null, false, false));
                         }
 
                         String max = String.valueOf(EnderPadAPI.getMaxPads(owner));
 
-                        if (max.equals("2147483647"))
-                        {
+                        if (max.equals("2147483647")) {
                             max = "&d∞";
                         }
 
@@ -372,17 +309,13 @@ public class EnderPad
 
                         int size = linked.size();
 
-                        if (size <= 0)
-                        {
+                        if (size <= 0) {
                             size = 1;
                         }
 
-                        if (size == 1)
-                        {
+                        if (size == 1) {
                             owner.sendMessage(StringParser.parse(Settings.links, null, this, "none", false, false));
-                        }
-                        else
-                        {
+                        } else {
                             owner.sendMessage(StringParser.parse(Settings.links, null, this, String.valueOf(size - 1), true, false));
                         }
 
@@ -391,92 +324,58 @@ public class EnderPad
                         owner.sendMessage(StringParser.parse(Settings.usage, null, this, String.valueOf(players.getStringList(ownerUUID.toString()).size()), false, false).replaceAll("<max>", max));
                     }
 
-                    if (Settings.logUse || Settings.debug)
-                    {
+                    if (Settings.logUse || Settings.debug) {
                         StaticMethods.log(owner.getName() + " created an EnderPad: " + this.getPadId());
                     }
 
                     EnderPadAPI.addTelepadToMemory(this);
-
-                    if (Settings.lightningCreate)
-                    {
-                        if (!StaticMethods.isVanished(owner))
-                        {
-                            Location loc = this.getLocation();
-                            loc.getWorld().strikeLightningEffect(loc);
-                        }
-                    }
-                }
-                else
-                {
+                } else {
                     StaticMethods.debug("EnderPadCreateEvent was cancelled.");
                 }
-            }
-            else
-            {
+            } else {
                 StaticMethods.debug("Player was null. Cannot create an EnderPad without a player.");
             }
         }
     }
 
-    public void delete(Player player)
-    {
+    public void delete(Player player) {
         EnderPadDestroyEvent destroyEvent = new EnderPadDestroyEvent(this, player);
         Bukkit.getServer().getPluginManager().callEvent(destroyEvent);
 
-        if (isSaved())
-        {
+        if (isSaved()) {
             Configuration pads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
             Configuration linkedPads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "linked.yml");
             Configuration players = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "players.yml");
 
-            if (linkId == null)
-            {
-                for (String key : linkedPads.getKeys(false))
-                {
+            if (linkId == null) {
+                for (String key : linkedPads.getKeys(false)) {
                     List<String> linked = linkedPads.getStringList(key);
 
-                    StaticMethods.log("&cThere was an error getting the linkId for " + getPadId());
-                    StaticMethods.log("&cThis could be caused by 3rd party modification, like WorldEdit.");
-                    StaticMethods.log("&eYou can usually ignore this warning. EnderPads will self-repair now.");
-
-                    if (linked.size() <= 1)
-                    {
+                    if (linked.size() <= 1) {
                         linkedPads.remove(key);
                         linkedPads.save();
-                    }
-                    else
-                    {
+                    } else {
                         linkedPads.remove(key);
                         linked.remove(getPadId());
                         linkedPads.add(key, linked);
                         linkedPads.save();
                     }
                 }
-            }
-            else
-            {
-                try
-                {
+            } else {
+                try {
                     List<String> linked = linkedPads.getStringList(linkId);
 
-                    if (linked.size() <= 1)
-                    {
+                    if (linked.size() <= 1) {
                         linkedPads.remove(getLinkId());
                         linkedPads.save();
-                    }
-                    else
-                    {
+                    } else {
                         linkedPads.remove(getLinkId());
                         linked.remove(getPadId());
                         linkedPads.add(getLinkId(), linked);
                         linkedPads.save();
                     }
-                }
-                catch (Exception ex)
-                {
-                    if (Settings.debug)
-                    {
+                } catch (Exception ex) {
+                    if (Settings.debug) {
                         ex.printStackTrace();
                     }
                 }
@@ -484,63 +383,46 @@ public class EnderPad
 
             List<String> owned = players.getStringList(getOwnerUUID().toString());
 
-            if (owned.size() <= 1)
-            {
+            if (owned.size() <= 1) {
                 players.remove(getOwnerUUID().toString());
                 players.save();
-            }
-            else
-            {
+            } else {
                 owned.remove(getPadId());
                 players.remove(getOwnerUUID().toString());
                 players.add(getOwnerUUID().toString(), owned);
                 players.save();
             }
 
-            if (pads.contains(getPadId()))
-            {
+            if (pads.contains(getPadId())) {
                 pads.remove(getPadId());
                 pads.save();
             }
 
             OfflinePlayer owner = Bukkit.getOfflinePlayer(this.getOwnerUUID());
 
-            if (owner != null)
-            {
-                if (owner.isOnline())
-                {
+            if (owner != null) {
+                if (owner.isOnline()) {
                     Player onlineOwner = (Player) owner;
-                    if (player != null)
-                    {
-                        if (player.equals(onlineOwner))
-                        {
-                            if (StaticMethods.hasPermission(player, "enderpads.alerts", false))
-                            {
+                    if (player != null) {
+                        if (player.equals(onlineOwner)) {
+                            if (StaticMethods.hasPermission(player, "enderpads.alerts", false)) {
                                 player.sendMessage(StringParser.parse(Settings.destroyed, null, this, null, false, false));
                             }
-                        }
-                        else
-                        {
-                            if (StaticMethods.hasPermission(onlineOwner, "enderpads.alerts", false))
-                            {
+                        } else {
+                            if (StaticMethods.hasPermission(onlineOwner, "enderpads.alerts", false)) {
                                 onlineOwner.sendMessage(StringParser.parse(Settings.destroyedPlayer, null, this, null, false, false));
                             }
                         }
-                    }
-                    else
-                    {
-                        if (StaticMethods.hasPermission(onlineOwner, "enderpads.alerts", false))
-                        {
+                    } else {
+                        if (StaticMethods.hasPermission(onlineOwner, "enderpads.alerts", false)) {
                             onlineOwner.sendMessage(StringParser.parse(Settings.destroyedMisc, null, this, null, false, false));
                         }
                     }
 
-                    if (StaticMethods.hasPermission((Player) owner, "enderpads.seeinfo", false))
-                    {
+                    if (StaticMethods.hasPermission((Player) owner, "enderpads.seeinfo", false)) {
                         String max = String.valueOf(EnderPadAPI.getMaxPads((Player) owner));
 
-                        if (max.equals("2147483647"))
-                        {
+                        if (max.equals("2147483647")) {
                             max = "&d∞";
                         }
 
@@ -548,54 +430,35 @@ public class EnderPad
 
                         int size = linked.size();
 
-                        if (size <= 0)
-                        {
+                        if (size <= 0) {
                             size = 1;
                         }
 
-                        if (!StaticMethods.hasPermission(onlineOwner, "enderpads.alerts", false))
-                        {
+                        if (!StaticMethods.hasPermission(onlineOwner, "enderpads.alerts", false)) {
                             onlineOwner.sendMessage(StringParser.parse(Settings.enderPadRemoved, null, this, null, false, false));
                         }
 
-                        if (size == 1)
-                        {
+                        if (size == 1) {
                             onlineOwner.sendMessage(StringParser.parse(Settings.links, null, this, "none", false, false));
-                        }
-                        else
-                        {
+                        } else {
                             onlineOwner.sendMessage(StringParser.parse(Settings.links, null, this, String.valueOf(size - 1), true, false));
                         }
 
                         max = StaticMethods.addColor(max);
-
                         onlineOwner.sendMessage(StringParser.parse(Settings.usage, null, this, String.valueOf(players.getStringList(ownerUUID.toString()).size()), false, false).replaceAll("<max>", max));
                     }
                 }
             }
 
-            if (Settings.logUse || Settings.debug)
-            {
-                if (player != null)
-                {
+            if (Settings.logUse || Settings.debug) {
+                if (player != null) {
                     StaticMethods.log(player.getName() + " destroyed an EnderPad: " + this.getPadId());
-                }
-                else
-                {
+                } else {
                     StaticMethods.log("An EnderPad was destroyed: " + this.getPadId());
                 }
             }
 
             EnderPadAPI.removeTelepadFromMemory(this);
-
-            if (Settings.lightningDestroy)
-            {
-                if (!StaticMethods.isVanished(player))
-                {
-                    Location loc = this.getLocation();
-                    loc.getWorld().strikeLightningEffect(loc);
-                }
-            }
         }
     }
 }

@@ -1,7 +1,9 @@
 package net.doodcraft.oshcon.bukkit.enderpads.listeners;
 
 import net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin;
-import net.doodcraft.oshcon.bukkit.enderpads.api.*;
+import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPad;
+import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPadAPI;
+import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPadUseEvent;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
 import net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods;
 import org.bukkit.Bukkit;
@@ -11,13 +13,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-public class EnderPadListener implements Listener
-{
+public class EnderPadListener implements Listener {
     @EventHandler(ignoreCancelled = true)
-    public void onUse(EnderPadUseEvent event)
-    {
-        if (event.getEntity() instanceof Player)
-        {
+    public void onUse(EnderPadUseEvent event) {
+        if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
 
             EnderPad origin = event.getOriginEnderPad();
@@ -26,8 +25,7 @@ public class EnderPadListener implements Listener
             Location from = origin.getLocation().add(0, 1, 0);
             Location to = dest.getLocation().add(0, 1, 0);
 
-            if (!dest.isValid())
-            {
+            if (!dest.isValid()) {
                 dest.delete(null);
                 EnderPadAPI.teleportEntity(origin, player);
                 return;
@@ -35,16 +33,7 @@ public class EnderPadListener implements Listener
 
             EnderPadsPlugin.playerCooldowns.put(player.getName(), System.currentTimeMillis());
 
-            if (Settings.lightningUse)
-            {
-                if (!StaticMethods.isVanished(player))
-                {
-                    to.getWorld().strikeLightningEffect(to);
-                }
-            }
-
-            if (Settings.logUse || Settings.debug)
-            {
+            if (Settings.logUse || Settings.debug) {
                 StaticMethods.log("&b" + player.getName() + " used an EnderPad: &d" + EnderPadAPI.getLocString(from) + " &b-> &d" + EnderPadAPI.getLocString(to));
             }
 
@@ -52,11 +41,9 @@ public class EnderPadListener implements Listener
             to.setYaw(player.getLocation().getYaw());
             to.setPitch(player.getLocation().getPitch());
 
-            Bukkit.getScheduler().runTaskLater(EnderPadsPlugin.plugin, new Runnable()
-            {
+            Bukkit.getScheduler().runTaskLater(EnderPadsPlugin.plugin, new Runnable() {
                 @Override
-                public void run()
-                {
+                public void run() {
                     player.teleport(to, PlayerTeleportEvent.TeleportCause.PLUGIN);
                 }
             }, 1L);

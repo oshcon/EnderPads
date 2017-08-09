@@ -1,12 +1,13 @@
 package net.doodcraft.oshcon.bukkit.enderpads;
 
+import de.slikey.effectlib.EffectManager;
 import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPad;
 import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPadAPI;
-import net.doodcraft.oshcon.bukkit.enderpads.listeners.*;
-import net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Configuration;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
+import net.doodcraft.oshcon.bukkit.enderpads.listeners.*;
 import net.doodcraft.oshcon.bukkit.enderpads.util.Compatibility;
+import net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods;
 import org.bstats.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.block.BlockFace;
@@ -19,8 +20,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class EnderPadsPlugin extends JavaPlugin
-{
+public class EnderPadsPlugin extends JavaPlugin {
+
+    // FIXME: There may be an error if an EnderPad block is modified by a third party plugin. Let's fix this soon.
+
     public static Plugin plugin;
     public static String version;
     public static Random random;
@@ -30,8 +33,7 @@ public class EnderPadsPlugin extends JavaPlugin
     public static Map<String, EnderPad> enderPads = new HashMap<>();
 
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         long start = System.currentTimeMillis();
 
         version = Bukkit.getBukkitVersion().split("-")[0];
@@ -44,66 +46,64 @@ public class EnderPadsPlugin extends JavaPlugin
         registerListeners();
         setExecutors();
 
-        if (!Compatibility.isSupported(version, "1.7.10", "1.12"))
-        {
-            StaticMethods.log("&cThis version of Minecraft has not been tested with EnderPads. Avoid using this in production. Support will not be given.");
+        Effects.effectManager = new EffectManager(plugin);
+        Effects.addAll();
+
+        if (!Compatibility.isSupported(version, "1.7.10", "1.12.1")) {
+            StaticMethods.log("&cThis version of Minecraft has not been tested with EnderPads. Support cannot be given if there are errors. Avoid using this in production. An update is already likely underway and will release soon.");
         }
 
         long finish = System.currentTimeMillis();
 
         StaticMethods.log("&aEnderPads v" + plugin.getDescription().getVersion() + " is now loaded. &e(" + (finish - start) + "ms)");
 
-        Bukkit.getScheduler().runTaskLater(plugin, new Runnable()
-        {
+        Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 EnderPadAPI.verifyAllTelepads();
             }
-        },1L);
+        }, 1L);
 
-        try
-        {
+        try {
             metrics = new Metrics(this);
-            metrics.addCustomChart(new Metrics.SingleLineChart("total_enderpads")
-            {
+            metrics.addCustomChart(new Metrics.SingleLineChart("total_enderpads") {
                 @Override
-                public int getValue()
-                {
+                public int getValue() {
                     Configuration pads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
                     return pads.getKeys(false).size();
                 }
             });
-        } catch (Exception ex)
-        {
+        } catch (Exception ex) {
             StaticMethods.log("&a[METRICS] &cThere was an error sending metrics to bStats.");
         }
     }
 
-    public void registerListeners()
-    {
+    @Override
+    public void onDisable() {
+        Bukkit.getScheduler().cancelTasks(plugin);
+        Effects.idleTasks.clear();
+    }
+
+    public void registerListeners() {
         registerEvents(plugin, new PlayerListener());
         registerEvents(plugin, new EntityListener());
         registerEvents(plugin, new BlockListener());
         registerEvents(plugin, new EnderPadListener());
+        registerEvents(plugin, new Effects());
 
         // BlockExplodeEvent was added in 1.8. We still want to support 1.7.10.
-        if (Compatibility.isSupported(version, "1.8", "2.0"))
-        {
+        if (Compatibility.isSupported(version, "1.8", "2.0")) {
             registerEvents(plugin, new BlockExplodeListener());
         }
     }
 
-    public static void registerEvents(Plugin plugin, Listener... listeners)
-    {
-        for (Listener listener : listeners)
-        {
+    public static void registerEvents(Plugin plugin, Listener... listeners) {
+        for (Listener listener : listeners) {
             Bukkit.getServer().getPluginManager().registerEvents(listener, plugin);
         }
     }
 
-    public void setExecutors()
-    {
+    public void setExecutors() {
         getCommand("enderpads").setExecutor(new EnderPadsCommand());
     }
 }
