@@ -1,6 +1,5 @@
 package net.doodcraft.oshcon.bukkit.enderpads.util;
 
-import com.earth2me.essentials.Essentials;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -10,8 +9,6 @@ import java.util.HashMap;
 public class Compatibility {
     public static HashMap<String, Plugin> hooked;
     public static ArrayList<String> warned;
-
-    public static Essentials essentials;
 
     public static void checkHooks() {
         hooked = new HashMap<>();
