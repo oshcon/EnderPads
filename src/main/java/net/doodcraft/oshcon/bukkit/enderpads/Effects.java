@@ -3,10 +3,7 @@ package net.doodcraft.oshcon.bukkit.enderpads;
 import de.slikey.effectlib.EffectManager;
 import de.slikey.effectlib.effect.WarpEffect;
 import de.slikey.effectlib.util.ParticleEffect;
-import net.doodcraft.oshcon.bukkit.enderpads.api.AddToMemoryEvent;
-import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPad;
-import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPadUseEvent;
-import net.doodcraft.oshcon.bukkit.enderpads.api.RemoveFromMemoryEvent;
+import net.doodcraft.oshcon.bukkit.enderpads.api.*;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
 import net.doodcraft.oshcon.bukkit.enderpads.util.Compatibility;
 import net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods;
@@ -150,11 +147,18 @@ public class Effects implements Listener {
     public void onRemove(RemoveFromMemoryEvent event) {
         EnderPad enderPad = event.getEnderPad();
         stopPoofEffect(enderPad);
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onDestroy(EnderPadDestroyEvent event) {
         if (Settings.lightningDestroy) {
-            if (!StaticMethods.isVanished(Bukkit.getPlayer(event.getEnderPad().getOwnerUUID()))) {
-                Location loc = event.getEnderPad().getLocation();
-                loc.getWorld().strikeLightningEffect(loc);
+            if (event.hasPlayer()) {
+                if (StaticMethods.isVanished(event.getPlayer())) {
+                    return;
+                }
             }
+            Location loc = event.getEnderPad().getLocation();
+            loc.getWorld().strikeLightningEffect(loc);
         }
     }
 }

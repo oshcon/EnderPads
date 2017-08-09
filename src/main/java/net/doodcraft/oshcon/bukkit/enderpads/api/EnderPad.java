@@ -58,6 +58,7 @@ public class EnderPad {
         linkId = id;
     }
 
+    @SuppressWarnings("Since15")
     public void setLinkId(Block blocks[]) {
         List<String> blockNames = new ArrayList<>();
 
@@ -410,7 +411,11 @@ public class EnderPad {
                             }
                         } else {
                             if (StaticMethods.hasPermission(onlineOwner, "enderpads.alerts", false)) {
-                                onlineOwner.sendMessage(StringParser.parse(Settings.destroyedPlayer, null, this, null, false, false));
+                                if (!StaticMethods.isVanished(player)) {
+                                    onlineOwner.sendMessage(StringParser.parse(Settings.destroyedPlayer, null, this, null, false, false));
+                                } else {
+                                    onlineOwner.sendMessage(StringParser.parse(Settings.destroyedMisc, null, this, null, false, false));
+                                }
                             }
                         }
                     } else {
