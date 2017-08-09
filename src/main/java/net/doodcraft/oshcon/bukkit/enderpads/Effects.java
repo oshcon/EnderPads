@@ -102,11 +102,16 @@ public class Effects implements Listener {
                 warpEffect.start();
             }
             final Location from = event.getOriginEnderPad().getLocation();
-            final Location to = player.getLocation();
+            final Location to = event.getDestinationEnderPad().getLocation();
             if (Settings.soundsFrom) {
-                String sound[] = Settings.soundFrom.split("-");
+                final String sound[] = Settings.soundFrom.split("-");
                 try {
-                    from.getWorld().playSound(from, Sound.valueOf(sound[0]), Float.valueOf(sound[1]), Float.valueOf(sound[2]));
+                    Bukkit.getScheduler().runTaskLater(EnderPadsPlugin.plugin, new Runnable() {
+                        @Override
+                        public void run() {
+                            from.getWorld().playSound(from, Sound.valueOf(sound[0]), Float.valueOf(sound[1]), Float.valueOf(sound[2]));
+                        }
+                    }, 1L);
                 } catch (Exception ex) {
                     StaticMethods.log("&cThere was an error getting the from sound in your config.");
                     StaticMethods.log(ex.getLocalizedMessage());
@@ -118,9 +123,9 @@ public class Effects implements Listener {
                     Bukkit.getScheduler().runTaskLater(EnderPadsPlugin.plugin, new Runnable() {
                         @Override
                         public void run() {
-                            to.getWorld().playSound(from, Sound.valueOf(sound[0]), Float.valueOf(sound[1]), Float.valueOf(sound[2]));
+                            to.getWorld().playSound(to, Sound.valueOf(sound[0]), Float.valueOf(sound[1]), Float.valueOf(sound[2]));
                         }
-                    }, 10L);
+                    }, 5L);
                 } catch (Exception ex) {
                     StaticMethods.log("&cThere was an error getting the to sound in your config.");
                     StaticMethods.log(ex.getLocalizedMessage());

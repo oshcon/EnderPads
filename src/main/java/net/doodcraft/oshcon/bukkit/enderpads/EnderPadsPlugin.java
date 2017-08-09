@@ -18,6 +18,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 public class EnderPadsPlugin extends JavaPlugin {
@@ -53,6 +54,10 @@ public class EnderPadsPlugin extends JavaPlugin {
             StaticMethods.log("&cThis version of Minecraft has not been tested with EnderPads. Support cannot be given if there are errors. Avoid using this in production. An update is already likely underway and will release soon.");
         }
 
+        if (version.equals("1.12")) {
+            StaticMethods.log("&c[PSA]: &eThere is a game-breaking bug in 1.12 with the crafting guide. Players can DUPLICATE items effortlessly. Consider updating your server NOW.");
+        }
+
         long finish = System.currentTimeMillis();
 
         StaticMethods.log("&aEnderPads v" + plugin.getDescription().getVersion() + " is now loaded. &e(" + (finish - start) + "ms)");
@@ -71,6 +76,13 @@ public class EnderPadsPlugin extends JavaPlugin {
                 public int getValue() {
                     Configuration pads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
                     return pads.getKeys(false).size();
+                }
+            });
+            metrics.addCustomChart(new Metrics.SingleLineChart("total_combinations") {
+                @Override
+                public int getValue() {
+                    Configuration linked = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "linked.yml");
+                    return linked.getKeys(false).size();
                 }
             });
         } catch (Exception ex) {
