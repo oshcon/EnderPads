@@ -38,8 +38,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <excludes>
                     </excludes>
                 </configuration>
@@ -52,12 +52,17 @@
                     <artifactSet>
                         <includes>
                             <include>org.bstats:*</include>
+                            <include>de.slikey:EffectLib</include>
                         </includes>
                     </artifactSet>
                     <relocations>
                         <relocation>
                             <pattern>org.bstats</pattern>
                             <shadedPattern>net.doodcraft.oshcon.bukkit.enderpads.shaded.org.bstats</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>de.slikey</pattern>
+                            <shadedPattern>net.doodcraft.oshcon.bukkit.enderpads.shaded.de.slikey</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>

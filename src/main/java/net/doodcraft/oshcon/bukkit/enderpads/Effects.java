@@ -54,7 +54,7 @@ public class Effects implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onEffectUse(EnderPadUseEvent event) {
+    public void onEffectUse(final EnderPadUseEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
             if (net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods.isVanished(player)) {
@@ -101,8 +101,8 @@ public class Effects implements Listener {
                 warpEffect.setLocation(event.getDestinationEnderPad().getLocation().add(0.5, 1, 0.5));
                 warpEffect.start();
             }
-            Location from = event.getOriginEnderPad().getLocation();
-            Location to = player.getLocation();
+            final Location from = event.getOriginEnderPad().getLocation();
+            final Location to = player.getLocation();
             if (Settings.soundsFrom) {
                 String sound[] = Settings.soundFrom.split("-");
                 try {
@@ -113,7 +113,7 @@ public class Effects implements Listener {
                 }
             }
             if (Settings.soundsTo) {
-                String sound[] = Settings.soundTo.split("-");
+                final String sound[] = Settings.soundTo.split("-");
                 try {
                     Bukkit.getScheduler().runTaskLater(EnderPadsPlugin.plugin, new Runnable() {
                         @Override

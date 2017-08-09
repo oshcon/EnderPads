@@ -17,7 +17,7 @@ public class EnderPadListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onUse(EnderPadUseEvent event) {
         if (event.getEntity() instanceof Player) {
-            Player player = (Player) event.getEntity();
+            final Player player = (Player) event.getEntity();
 
             EnderPad origin = event.getOriginEnderPad();
             EnderPad dest = event.getDestinationEnderPad();
@@ -41,10 +41,12 @@ public class EnderPadListener implements Listener {
             to.setYaw(player.getLocation().getYaw());
             to.setPitch(player.getLocation().getPitch());
 
+            final Location finalTo = to;
+
             Bukkit.getScheduler().runTaskLater(EnderPadsPlugin.plugin, new Runnable() {
                 @Override
                 public void run() {
-                    player.teleport(to, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                    player.teleport(finalTo, PlayerTeleportEvent.TeleportCause.PLUGIN);
                 }
             }, 1L);
         }

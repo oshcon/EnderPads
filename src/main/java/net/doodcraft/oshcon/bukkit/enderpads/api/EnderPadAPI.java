@@ -535,7 +535,7 @@ public class EnderPadAPI {
 
         StaticMethods.log("&bVerifying and caching all EnderPads..");
 
-        Configuration pads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
+        final Configuration pads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
 
         Bukkit.getServer().getScheduler().runTask(EnderPadsPlugin.plugin, new Runnable() {
             @Override
