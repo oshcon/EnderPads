@@ -30,19 +30,6 @@ public class EnderPadsCommand implements CommandExecutor {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
 
-                // Debugging command.
-                if (args[0].equalsIgnoreCase("dev")) {
-                    Configuration pads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
-                    Configuration linkedPads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "linked.yml");
-                    Configuration players = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "players.yml");
-                    sender.sendMessage("Version: " + EnderPadsPlugin.plugin.getDescription().getVersion());
-                    sender.sendMessage("EnderPads: " + pads.getKeys(false).size());
-                    sender.sendMessage("Create: "); // average
-                    sender.sendMessage("Destroy: "); // average
-                    sender.sendMessage("Use: "); // average
-                    return true;
-                }
-
                 if (!StaticMethods.hasPermission(player, "enderpads.command.enderpads", true)) {
                     return false;
                 }
