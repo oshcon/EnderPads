@@ -57,12 +57,14 @@ public class Effects implements Listener {
             if (net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods.isVanished(player)) {
                 return;
             }
+
             if (Settings.lightningUse) {
                 if (!StaticMethods.isVanished(player)) {
                     Location loc = event.getDestinationEnderPad().getLocation();
                     loc.getWorld().strikeLightningEffect(loc);
                 }
             }
+
             if (Settings.potionEffectsEnabled) {
                 if (Compatibility.isSupported(EnderPadsPlugin.version, "1.8", "2.0")) {
                     for (String string : Settings.potionEffects) {
@@ -80,6 +82,7 @@ public class Effects implements Listener {
                     Settings.potionEffectsEnabled = false;
                 }
             }
+
             if (Settings.warpParticlesOrigin) {
                 WarpEffect warpEffect = new WarpEffect(effectManager);
                 warpEffect.particle = ParticleEffect.SPELL_WITCH;
@@ -89,6 +92,7 @@ public class Effects implements Listener {
                 warpEffect.setLocation(event.getOriginEnderPad().getLocation().add(0.5, 1, 0.5));
                 warpEffect.start();
             }
+
             if (Settings.warpParticlesDestination) {
                 WarpEffect warpEffect = new WarpEffect(effectManager);
                 warpEffect.particle = ParticleEffect.SPELL_WITCH;
@@ -98,8 +102,10 @@ public class Effects implements Listener {
                 warpEffect.setLocation(event.getDestinationEnderPad().getLocation().add(0.5, 1, 0.5));
                 warpEffect.start();
             }
+
             final Location from = event.getOriginEnderPad().getLocation();
             final Location to = event.getDestinationEnderPad().getLocation();
+
             if (Settings.soundsFrom) {
                 final String sound[] = Settings.soundFrom.split("-");
                 try {
@@ -114,6 +120,7 @@ public class Effects implements Listener {
                     StaticMethods.log(ex.getLocalizedMessage());
                 }
             }
+
             if (Settings.soundsTo) {
                 final String sound[] = Settings.soundTo.split("-");
                 try {
@@ -135,10 +142,12 @@ public class Effects implements Listener {
     public void onAdd(AddToMemoryEvent event) {
         EnderPad enderPad = event.getEnderPad();
         startPoofEffect(enderPad);
-        if (Settings.lightningCreate) {
-            if (!StaticMethods.isVanished(Bukkit.getPlayer(event.getEnderPad().getOwnerUUID()))) {
-                Location loc = event.getEnderPad().getLocation();
-                loc.getWorld().strikeLightningEffect(loc);
+        if (enderPad.isValid() && enderPad.isSaved()) {
+            if (Settings.lightningCreate) {
+                if (!StaticMethods.isVanished(Bukkit.getPlayer(event.getEnderPad().getOwnerUUID()))) {
+                    Location loc = event.getEnderPad().getLocation();
+                    loc.getWorld().strikeLightningEffect(loc);
+                }
             }
         }
     }
@@ -151,14 +160,16 @@ public class Effects implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onDestroy(EnderPadDestroyEvent event) {
-        if (Settings.lightningDestroy) {
-            if (event.hasPlayer()) {
-                if (StaticMethods.isVanished(event.getPlayer())) {
-                    return;
+        if (event.getEnderPad().isValid()) {
+            if (Settings.lightningDestroy) {
+                if (event.hasPlayer()) {
+                    if (StaticMethods.isVanished(event.getPlayer())) {
+                        return;
+                    }
                 }
+                Location loc = event.getEnderPad().getLocation();
+                loc.getWorld().strikeLightningEffect(loc);
             }
-            Location loc = event.getEnderPad().getLocation();
-            loc.getWorld().strikeLightningEffect(loc);
         }
     }
 }

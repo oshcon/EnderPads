@@ -100,8 +100,7 @@ public class PlayerListener implements Listener {
                 EnderPad enderPad = new EnderPad(centerBlock.getLocation());
 
                 if (EnderPadsPlugin.playerCooldowns.containsKey(player.getName())) {
-                    if ((System.currentTimeMillis() - EnderPadsPlugin.playerCooldowns.get(player.getName())
-                            > (Settings.playerCooldown * 1000))) {
+                    if ((System.currentTimeMillis() - EnderPadsPlugin.playerCooldowns.get(player.getName()) > (Settings.playerCooldown * 1000))) {
                         if (enderPad.isValid()) {
                             if (player.getPassenger() != null) {
                                 StaticMethods.debug("Teleporting entities with passengers is not yet supported.");

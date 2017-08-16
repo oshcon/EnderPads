@@ -18,12 +18,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 
 public class EnderPadsPlugin extends JavaPlugin {
-
-    // FIXME: There may be an error if an EnderPad block is modified by a third party plugin. Let's fix this soon.
 
     public static Plugin plugin;
     public static String version;

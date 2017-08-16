@@ -4,7 +4,7 @@
 
     <groupId>net.doodcraft</groupId>
     <artifactId>EnderPads</artifactId>
-    <version>0.3.3-beta</version>
+    <version>0.3.4-beta</version>
 
     <build>
         <finalName>${project.artifactId}-${project.version}</finalName>

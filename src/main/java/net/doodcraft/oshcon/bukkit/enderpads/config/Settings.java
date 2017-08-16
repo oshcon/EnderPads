@@ -258,7 +258,7 @@ public class Settings {
 
                 locale.save();
 
-                config.add("General.Version", "0.3.2-beta");
+                config.add("General.Version", "0.3.4-beta");
                 config.save();
 
                 setNewLocaleValues(locale);
