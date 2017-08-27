@@ -95,7 +95,7 @@ public class Settings {
         reloadSuccess = "<prefix> &aPlugin reloaded!";
         reloadFailed = "<prefix> &cThere was an error.";
         atMaximum = "<prefix> &cYou cannot build any more.";
-        cooldownMessage = "&cPlease wait... &e[<remaining>ms]";
+        cooldownMessage = "&cPlease wait... &8[&e<remaining>ms&8]";
         enderPad = "&8:: &3EnderPad: &7[<padid>]";
         enderPadCreated = "&8:: &3EnderPad: &7[<padid>] &a(new)";
         enderPadRemoved = "&8:: &3EnderPad: &7[<padid>] &c(removed)";

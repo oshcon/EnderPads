@@ -14,7 +14,7 @@ public class ReflectionUtil {
             return;
         }
 
-        if (Compatibility.isSupported(EnderPadsPlugin.version, "1.12", "1.12")) {
+        if (Compatibility.isSupported(EnderPadsPlugin.version, "1.12", "1.12.1")) {
             ReflectionUtil.send112Actionbar(player, message);
             return;
         }

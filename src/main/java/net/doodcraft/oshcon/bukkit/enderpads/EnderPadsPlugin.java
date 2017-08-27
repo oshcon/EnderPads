@@ -7,6 +7,7 @@ import net.doodcraft.oshcon.bukkit.enderpads.config.Configuration;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
 import net.doodcraft.oshcon.bukkit.enderpads.listeners.*;
 import net.doodcraft.oshcon.bukkit.enderpads.util.Compatibility;
+import net.doodcraft.oshcon.bukkit.enderpads.util.IconMenu;
 import net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods;
 import org.bstats.Metrics;
 import org.bukkit.Bukkit;
@@ -38,6 +39,14 @@ public class EnderPadsPlugin extends JavaPlugin {
         plugin = this;
         random = new Random();
 
+        if (!Compatibility.isSupported(version, "1.7.10", "1.12.1")) {
+            StaticMethods.log("&cThis version of Minecraft has not been tested with this version of EnderPads. Support cannot be given if there are errors. Avoid using this in production. An update is already likely underway and will release soon.");
+        }
+
+        if (version.equals("1.12")) {
+            StaticMethods.log("&c[PSA]: &eThere is a game-breaking bug in 1.12 with the crafting guide. Players can DUPLICATE items effortlessly. Consider updating your server NOW.");
+        }
+
         Settings.setupDefaults();
         Compatibility.checkHooks();
 
@@ -46,14 +55,6 @@ public class EnderPadsPlugin extends JavaPlugin {
 
         Effects.effectManager = new EffectManager(plugin);
         Effects.addAll();
-
-        if (!Compatibility.isSupported(version, "1.7.10", "1.12.1")) {
-            StaticMethods.log("&cThis version of Minecraft has not been tested with EnderPads. Support cannot be given if there are errors. Avoid using this in production. An update is already likely underway and will release soon.");
-        }
-
-        if (version.equals("1.12")) {
-            StaticMethods.log("&c[PSA]: &eThere is a game-breaking bug in 1.12 with the crafting guide. Players can DUPLICATE items effortlessly. Consider updating your server NOW.");
-        }
 
         long finish = System.currentTimeMillis();
 
