@@ -7,7 +7,6 @@ import net.doodcraft.oshcon.bukkit.enderpads.config.Configuration;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
 import net.doodcraft.oshcon.bukkit.enderpads.listeners.*;
 import net.doodcraft.oshcon.bukkit.enderpads.util.Compatibility;
-import net.doodcraft.oshcon.bukkit.enderpads.util.IconMenu;
 import net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods;
 import org.bstats.Metrics;
 import org.bukkit.Bukkit;
@@ -27,38 +26,36 @@ public class EnderPadsPlugin extends JavaPlugin {
     public static String version;
     public static Random random;
     public static Metrics metrics;
-    public static BlockFace faces[] = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
+
     public static Map<String, Long> playerCooldowns = new HashMap<>();
     public static Map<String, EnderPad> enderPads = new HashMap<>();
 
+    public static BlockFace faces[] = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
+
     @Override
     public void onEnable() {
-        long start = System.currentTimeMillis();
-
         version = Bukkit.getBukkitVersion().split("-")[0];
+
         plugin = this;
+
         random = new Random();
 
-        if (!Compatibility.isSupported(version, "1.7.10", "1.12.1")) {
-            StaticMethods.log("&cThis version of Minecraft has not been tested with this version of EnderPads. Support cannot be given if there are errors. Avoid using this in production. An update is already likely underway and will release soon.");
+        Settings.setupDefaults();
+
+        if (!Compatibility.isSupported(version, "1.7.10", "1.12.2")) {
+            StaticMethods.log("&cThis version of EnderPads has not been tested with this version of Minecraft. Support may not be given if there are errors. Avoid using this in production. An update is already likely underway and will release soon. Thank you for your patience!");
         }
 
         if (version.equals("1.12")) {
             StaticMethods.log("&c[PSA]: &eThere is a game-breaking bug in 1.12 with the crafting guide. Players can DUPLICATE items effortlessly. Consider updating your server NOW.");
         }
 
-        Settings.setupDefaults();
         Compatibility.checkHooks();
 
         registerListeners();
         setExecutors();
 
-        Effects.effectManager = new EffectManager(plugin);
-        Effects.addAll();
-
-        long finish = System.currentTimeMillis();
-
-        StaticMethods.log("&aEnderPads v" + plugin.getDescription().getVersion() + " is now loaded. &e(" + (finish - start) + "ms)");
+        StaticMethods.log("&aEnderPads v" + plugin.getDescription().getVersion() + " is now loaded.");
 
         Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
             @Override
@@ -86,6 +83,9 @@ public class EnderPadsPlugin extends JavaPlugin {
         } catch (Exception ex) {
             StaticMethods.log("&a[METRICS] &cThere was an error sending metrics to bStats.");
         }
+
+        Effects.effectManager = new EffectManager(plugin);
+        Effects.addAll();
     }
 
     @Override
@@ -102,7 +102,7 @@ public class EnderPadsPlugin extends JavaPlugin {
         registerEvents(plugin, new Effects());
 
         // BlockExplodeEvent was added in 1.8. We still want to support 1.7.10.
-        if (Compatibility.isSupported(version, "1.8", "2.0")) {
+        if (!Compatibility.isSupported(version, "0.0.1", "1.7.10")) {
             registerEvents(plugin, new BlockExplodeListener());
         }
     }

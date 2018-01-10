@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
 
 public class EntityListener implements Listener {
     @EventHandler(ignoreCancelled = true)
@@ -24,5 +25,10 @@ public class EntityListener implements Listener {
         for (Block block : event.blockList()) {
             EnderPadAPI.destroyCheck(block, null);
         }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onEntityInteract(EntityInteractEvent event) {
+        // todo: Add entity teleportation support.
     }
 }

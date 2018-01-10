@@ -18,7 +18,6 @@ import java.util.List;
 
 // CREDIT: https://bukkit.org/members/ultimate_n00b.90707285/
 public class IconMenu implements Listener {
-
     private String name;
     private int size;
     private onClick click;

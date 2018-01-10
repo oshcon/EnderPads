@@ -4,7 +4,7 @@
 
     <groupId>net.doodcraft</groupId>
     <artifactId>EnderPads</artifactId>
-    <version>0.3.4-beta</version>
+    <version>0.3.5-beta</version>
 
     <build>
         <finalName>${project.artifactId}-${project.version}</finalName>
@@ -97,13 +97,13 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.12.1-R0.1-SNAPSHOT</version>
+            <version>1.12.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.12.1-R0.1-SNAPSHOT</version>
+            <version>1.12.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

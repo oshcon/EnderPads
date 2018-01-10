@@ -15,6 +15,8 @@ import java.util.logging.Logger;
 
 public class StaticMethods {
 
+    public static boolean PRE_19 = true;
+
     public static boolean isVanished(Player player) {
         if (player == null) {
             return false;
@@ -28,11 +30,18 @@ public class StaticMethods {
     }
 
     public static boolean isOffHandClick(PlayerInteractEvent event) {
+
+        if (!PRE_19) {
+            return event.getHand().equals(EquipmentSlot.valueOf("OFF_HAND"));
+        }
+
         // Maintain compatibility with versions prior to the combat update.
         if (Compatibility.isSupported(EnderPadsPlugin.version, "1.9", "2.0")) {
+            PRE_19 = false;
             return event.getHand().equals(EquipmentSlot.valueOf("OFF_HAND"));
         } else {
             try {
+                PRE_19 = true;
                 return event.getHand().equals(EquipmentSlot.valueOf("OFF_HAND"));
             } catch (NoSuchMethodError ex) {
                 return false;

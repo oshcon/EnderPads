@@ -3,8 +3,10 @@ package net.doodcraft.oshcon.bukkit.enderpads.api;
 import net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Configuration;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
+import net.doodcraft.oshcon.bukkit.enderpads.util.NameCache;
 import net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods;
 import net.doodcraft.oshcon.bukkit.enderpads.util.StringParser;
+import net.doodcraft.oshcon.bukkit.enderpads.util.UUIDCache;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,12 +33,16 @@ public class EnderPad {
     private Block southBlock;
     private Block westBlock;
 
+    private Configuration pads;
+
     public EnderPad(Location location) {
         setLocation(location);
         setPadId();
 
         if (isSaved()) {
-            Configuration pads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
+            if (pads == null) {
+                pads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
+            }
             ownerUUID = UUID.fromString(pads.getString(getPadId() + ".Owner.UUID"));
         }
 
@@ -71,7 +77,7 @@ public class EnderPad {
     }
 
     public void setOwnerUUID(Player player) {
-        ownerUUID = player.getUniqueId();
+        ownerUUID = UUIDCache.getUniqueID(player.getName());
     }
 
     public void setLocation(Location location) {
@@ -173,7 +179,7 @@ public class EnderPad {
     }
 
     public String getOwnerName() {
-        return Bukkit.getOfflinePlayer(this.ownerUUID).getName();
+        return NameCache.getUsername(this.getOwnerUUID());
     }
 
     public List<EnderPad> getLinkedPads() {
@@ -226,21 +232,22 @@ public class EnderPad {
         String check = EnderPadAPI.getBlockString(getCenterBlock());
         String valid = Settings.centerMaterial.toUpperCase();
 
-        if (!check.equals(valid)) {
-            return false;
-        }
-
-        return linkId != null;
+        // todo: check this
+        return check.equals(valid) && linkId != null;
     }
 
     public boolean isSaved() {
-        Configuration pads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
+        if (pads == null) {
+            pads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
+        }
         return pads.contains(padId);
     }
 
     public void save() {
         if (ownerUUID != null) {
-            Configuration pads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
+            if (pads == null) {
+                pads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
+            }
             Configuration linkedPads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "linked.yml");
             Configuration players = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "players.yml");
 
@@ -326,7 +333,7 @@ public class EnderPad {
                     }
 
                     if (Settings.logUse || Settings.debug) {
-                        StaticMethods.log(owner.getName() + " created an EnderPad: " + this.getPadId());
+                        StaticMethods.log(StaticMethods.addColor("&b" + owner.getName() + " created an EnderPad: &d" + this.getPadId()));
                     }
 
                     EnderPadAPI.addTelepadToMemory(this);
@@ -344,7 +351,9 @@ public class EnderPad {
         Bukkit.getServer().getPluginManager().callEvent(destroyEvent);
 
         if (isSaved()) {
-            Configuration pads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
+            if (pads == null) {
+                pads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
+            }
             Configuration linkedPads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "linked.yml");
             Configuration players = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "players.yml");
 
@@ -457,9 +466,9 @@ public class EnderPad {
 
             if (Settings.logUse || Settings.debug) {
                 if (player != null) {
-                    StaticMethods.log(player.getName() + " destroyed an EnderPad: " + this.getPadId());
+                    StaticMethods.log(StaticMethods.addColor("&b" + player.getName() + " destroyed an EnderPad: &d" + this.getPadId()));
                 } else {
-                    StaticMethods.log("An EnderPad was destroyed: " + this.getPadId());
+                    StaticMethods.log(StaticMethods.addColor("&bAn EnderPad was destroyed: &d" + this.getPadId()));
                 }
             }
 

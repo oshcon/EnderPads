@@ -6,10 +6,7 @@ import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPadAPI;
 import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPadClickEvent;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Configuration;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
-import net.doodcraft.oshcon.bukkit.enderpads.util.BlockHelper;
-import net.doodcraft.oshcon.bukkit.enderpads.util.ReflectionUtil;
-import net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods;
-import net.doodcraft.oshcon.bukkit.enderpads.util.StringParser;
+import net.doodcraft.oshcon.bukkit.enderpads.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -20,7 +17,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.io.File;
@@ -28,34 +24,34 @@ import java.util.List;
 
 public class PlayerListener implements Listener {
     @EventHandler(ignoreCancelled = true)
-    public void onEntityInteract(EntityInteractEvent event) {
-        // TODO: Add entity teleportation support.
-    }
-
-    @EventHandler(ignoreCancelled = true)
     public void onInteract(PlayerInteractEvent event) {
+
         Player player = event.getPlayer();
+        Block clicked = event.getClickedBlock();
+        Material type = clicked.getType();
+
         if (event.getAction().equals(Action.valueOf("RIGHT_CLICK_BLOCK"))) {
+
             if (StaticMethods.isOffHandClick(event)) {
                 return;
             }
 
-            Block clicked = event.getClickedBlock();
-            Material type = clicked.getType();
-
             if (EnderPadAPI.isValidPlate(type)) {
+
                 EnderPad enderPad = new EnderPad(clicked.getRelative(BlockFace.DOWN).getLocation());
 
                 if (enderPad.isValid()) {
+
                     EnderPadClickEvent clickEvent = new EnderPadClickEvent(player, enderPad);
                     Bukkit.getPluginManager().callEvent(clickEvent);
 
                     if (!clickEvent.isCancelled()) {
+
                         if (!StaticMethods.hasPermission(player, "enderpads.seeinfo", false)) {
                             return;
                         }
 
-                        if (!player.getUniqueId().equals(enderPad.getOwnerUUID())) {
+                        if (!UUIDCache.getUniqueID(player.getName()).equals(enderPad.getOwnerUUID())) {
                             if (!StaticMethods.hasPermission(player, "enderpads.seeinfo.others", false)) {
                                 return;
                             }
@@ -66,6 +62,18 @@ public class PlayerListener implements Listener {
                         }
 
                         String linkId = enderPad.getLinkId();
+
+                        if (StaticMethods.hasPermission(player, "enderpads.command.list", false)) {
+                            if (player.isSneaking()) {
+                                StaticMenuMethods.openPadListPageByLink(player, linkId, 0);
+                                event.setCancelled(true);
+                                return;
+                            } else {
+                                StaticMenuMethods.openPadOptions(player, enderPad);
+                                event.setCancelled(true);
+                                return;
+                            }
+                        }
 
                         Configuration linkedPads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "linked.yml");
 
@@ -95,13 +103,18 @@ public class PlayerListener implements Listener {
         }
 
         if (event.getAction().equals(Action.PHYSICAL)) {
-            if (EnderPadAPI.isValidPlate(event.getClickedBlock().getType())) {
+
+            if (EnderPadAPI.isValidPlate(type)) {
+
                 Block centerBlock = event.getClickedBlock().getRelative(BlockFace.DOWN);
                 EnderPad enderPad = new EnderPad(centerBlock.getLocation());
 
-                if (EnderPadsPlugin.playerCooldowns.containsKey(player.getName())) {
-                    if ((System.currentTimeMillis() - EnderPadsPlugin.playerCooldowns.get(player.getName()) > (Settings.playerCooldown * 1000))) {
-                        if (enderPad.isValid()) {
+                if (enderPad.isValid()) {
+
+                    if (EnderPadsPlugin.playerCooldowns.containsKey(player.getName())) {
+
+                        if ((System.currentTimeMillis() - EnderPadsPlugin.playerCooldowns.get(player.getName()) > (Settings.playerCooldown * 1000))) {
+
                             if (player.getPassenger() != null) {
                                 StaticMethods.debug("Teleporting entities with passengers is not yet supported.");
                                 return;
@@ -110,38 +123,35 @@ public class PlayerListener implements Listener {
                             if (StaticMethods.hasPermission(player, "enderpads.use", true)) {
                                 EnderPadAPI.teleportEntity(enderPad, player);
                             }
-                        } else {
-                            enderPad.delete(null);
-                        }
-                    } else {
-                        long remaining = (Settings.playerCooldown * 1000) - (System.currentTimeMillis() - EnderPadsPlugin.playerCooldowns.get(player.getName()));
-                        long portion = (Settings.playerCooldown * 1000) / 4;
 
-                        if (remaining < (Settings.playerCooldown * 1000) - portion) {
-                            if (enderPad.isValid() && enderPad.isSaved()) {
+                        } else {
+
+                            long remaining = (Settings.playerCooldown * 1000) - (System.currentTimeMillis() - EnderPadsPlugin.playerCooldowns.get(player.getName()));
+                            long portion = (Settings.playerCooldown * 1000) / 4;
+
+                            if (remaining < (Settings.playerCooldown * 1000) - portion) {
+
                                 if (StaticMethods.hasPermission(player, "enderpads.use", true)) {
+
                                     if (!Settings.cooldownMessage.equals(" ") || Settings.cooldownMessage != null) {
+
                                         if (!StaticMethods.isVanished(player)) {
                                             ReflectionUtil.sendActionBar(player, StaticMethods.addColor(Settings.cooldownMessage.replaceAll("<remaining>", String.valueOf(remaining))));
                                         }
                                     }
                                 }
-                            } else {
-                                enderPad.delete(null);
                             }
                         }
-                    }
-                } else {
-                    if (enderPad.isValid()) {
+                    } else {
                         if (player.getPassenger() != null) {
                             StaticMethods.debug("Teleporting entities with passengers is not yet supported.");
                             return;
                         }
 
                         EnderPadAPI.teleportEntity(enderPad, player);
-                    } else {
-                        enderPad.delete(null);
                     }
+                } else {
+                    enderPad.delete(null);
                 }
             }
         }

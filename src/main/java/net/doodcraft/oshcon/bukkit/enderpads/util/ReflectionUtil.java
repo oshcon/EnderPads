@@ -14,7 +14,7 @@ public class ReflectionUtil {
             return;
         }
 
-        if (Compatibility.isSupported(EnderPadsPlugin.version, "1.12", "1.12.1")) {
+        if (Compatibility.isSupported(EnderPadsPlugin.version, "1.12", "1.12.2")) {
             ReflectionUtil.send112Actionbar(player, message);
             return;
         }
@@ -59,8 +59,8 @@ public class ReflectionUtil {
     private static Class<?> getNMSClass(String name) {
         try {
             return Class.forName("net.minecraft.server." + getVersion() + "." + name);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
             return null;
         }
     }

@@ -142,7 +142,8 @@ public class Effects implements Listener {
     public void onAdd(AddToMemoryEvent event) {
         EnderPad enderPad = event.getEnderPad();
         startPoofEffect(enderPad);
-        if (enderPad.isValid() && enderPad.isSaved()) {
+        // if (enderPad.isValid() && enderPad.isSaved()) {
+        if (enderPad.isSaved()) {
             if (Settings.lightningCreate) {
                 if (!StaticMethods.isVanished(Bukkit.getPlayer(event.getEnderPad().getOwnerUUID()))) {
                     Location loc = event.getEnderPad().getLocation();
@@ -160,7 +161,8 @@ public class Effects implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onDestroy(EnderPadDestroyEvent event) {
-        if (event.getEnderPad().isValid()) {
+        //if (event.getEnderPad().isValid()) {
+        if (event.getEnderPad().isSaved()) {
             if (Settings.lightningDestroy) {
                 if (event.hasPlayer()) {
                     if (StaticMethods.isVanished(event.getPlayer())) {

@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Set;
 
 public class EnderPadAPI {
-    // TODO: Create a method to return a collection of EnderPads based on a non-center block.
-
     /**
      * Check whether a block is part of an EnderPad.
      * Useful if you want to cancel/stop destruction of an EnderPad.
@@ -31,7 +29,7 @@ public class EnderPadAPI {
      * This method will not work at present. Also, I've realized that because of the nature of
      * EnderPads themselves means I cannot accurately create a method to return an EnderPad based
      * on a non-center block. I could however return a Collection of EnderPads. I will implement this
-     * in the next update.
+     * in another update.
      *
      * @param block the block being checked
      * @return true if the block is part of an EnderPad
@@ -336,13 +334,7 @@ public class EnderPadAPI {
      * it can return null if the location does not contain a block
      */
     public static EnderPad getPadFromID(String id) {
-        String[] coords = id.split(" ");
-        String world = String.valueOf(coords[0]);
-        double x = Double.valueOf(coords[1]);
-        double y = Double.valueOf(coords[2]);
-        double z = Double.valueOf(coords[3]);
-        Location location = new Location(Bukkit.getWorld(world), x, y, z);
-        return getPadFromLocation(location);
+        return EnderPadsPlugin.enderPads.get(id);
     }
 
     /**
@@ -541,18 +533,28 @@ public class EnderPadAPI {
             @Override
             public void run() {
                 for (String padId : pads.getKeys(false)) {
+
                     String args[] = padId.split(" ");
+
                     World world = Bukkit.getWorld(args[0]);
+
+                    // If the world no longer exists, skip the check.
+                    if (world == null) {
+                        return;
+                    }
+
                     double x = Integer.valueOf(args[1]);
                     double y = Integer.valueOf(args[2]);
                     double z = Integer.valueOf(args[3]);
+
                     Location padLocation = new Location(world, x, y, z);
+
                     EnderPad enderPad = new EnderPad(padLocation);
 
                     if (verify(enderPad, pads)) {
                         addTelepadToMemory(enderPad);
                     } else {
-                        StaticMethods.log("&cDiscovered and removed an invalid EnderPad: &e" + enderPad.getPadId());
+                        StaticMethods.log("&cDiscovered and removed an invalid EnderPad: &e" + padId);
                         enderPad.delete(null);
                         removeTelepadFromMemory(enderPad);
                     }
@@ -562,6 +564,10 @@ public class EnderPadAPI {
 
         long finish = System.currentTimeMillis();
 
-        StaticMethods.log("&bVerified and cached " + pads.getKeys(false).size() + " EnderPads! &e(" + (finish - start) + "ms)");
+        if (pads.getKeys(false).size() == 1) {
+            StaticMethods.log("&bVerified and cached " + pads.getKeys(false).size() + " EnderPad. &e(" + (finish - start) + "ms)");
+        } else {
+            StaticMethods.log("&bVerified and cached " + pads.getKeys(false).size() + " EnderPads. &e(" + (finish - start) + "ms)");
+        }
     }
 }
