@@ -6,6 +6,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 public class EnderPadCreateEvent extends Event implements Cancellable {
+
     private static final HandlerList handlers = new HandlerList();
 
     private Player player;

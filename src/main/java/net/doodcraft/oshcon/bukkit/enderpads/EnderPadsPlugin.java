@@ -7,6 +7,7 @@ import net.doodcraft.oshcon.bukkit.enderpads.config.Configuration;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
 import net.doodcraft.oshcon.bukkit.enderpads.listeners.*;
 import net.doodcraft.oshcon.bukkit.enderpads.util.Compatibility;
+import net.doodcraft.oshcon.bukkit.enderpads.util.PermissionCache;
 import net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods;
 import org.bstats.Metrics;
 import org.bukkit.Bukkit;
@@ -100,6 +101,7 @@ public class EnderPadsPlugin extends JavaPlugin {
         registerEvents(plugin, new BlockListener());
         registerEvents(plugin, new EnderPadListener());
         registerEvents(plugin, new Effects());
+        registerEvents(plugin, new PermissionCache());
 
         // BlockExplodeEvent was added in 1.8. We still want to support 1.7.10.
         if (!Compatibility.isSupported(version, "0.0.1", "1.7.10")) {
@@ -116,4 +118,15 @@ public class EnderPadsPlugin extends JavaPlugin {
     public void setExecutors() {
         getCommand("enderpads").setExecutor(new EnderPadsCommand());
     }
+
+    // TODO: 0.3.6-beta
+    // Add destroy option to icon menu
+    // Add full entity teleportation
+    // Cache player permissions for 15 minutes or until player quits
+    // TODO: Add support for passenger entities
+    // TODO: Check performance, use caches where able
+    // TODO: Begin workaround for 1.13 data value removals (though Spigot aims to retain legacy capability, temporarily)
+    // TODO: Clean up code, reformat, keep it consistent.
+    // TODO: Discover source of rare memory leak in PlayerListener.onInteract
+    // TODO: Add option to disable EnderPad validation on use, use the cache instead
 }

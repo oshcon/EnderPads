@@ -1,7 +1,9 @@
 package net.doodcraft.oshcon.bukkit.enderpads.util;
 
 public class NumberConverter {
+
     public static String convert(final int n) {
+
         if (n < 0) {
             return "negative " + convert(-n);
         }
@@ -30,7 +32,7 @@ public class NumberConverter {
     }
 
     private static final String[] units = {
-            "", "one", "two", "three", "four", "five", "six", "seven",
+            "zero", "one", "two", "three", "four", "five", "six", "seven",
             "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen",
             "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"
     };

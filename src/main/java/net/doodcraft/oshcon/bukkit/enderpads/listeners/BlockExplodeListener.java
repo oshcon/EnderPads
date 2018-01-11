@@ -7,6 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockExplodeEvent;
 
 public class BlockExplodeListener implements Listener {
+
     @EventHandler(ignoreCancelled = true)
     public void onExplode(BlockExplodeEvent event) {
         for (Block block : event.blockList()) {

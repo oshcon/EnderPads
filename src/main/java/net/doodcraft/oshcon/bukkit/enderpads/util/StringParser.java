@@ -5,7 +5,9 @@ import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
 import org.bukkit.entity.Player;
 
 public class StringParser {
+
     public static String parse(String string, Player player, EnderPad enderPad, String num, Boolean spelledOut, Boolean online) {
+
         if (player != null) {
             string = string.replaceAll("<owner>", player.getName());
         }

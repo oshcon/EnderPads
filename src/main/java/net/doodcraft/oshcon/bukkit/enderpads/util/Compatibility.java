@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Compatibility {
+
     public static HashMap<String, Plugin> hooked;
     public static ArrayList<String> warned;
 
@@ -16,15 +17,17 @@ public class Compatibility {
     }
 
     public static boolean isHooked(String name) {
+
         if (hooked.get(name) != null) {
+
             if (getPlugin(name) != null && getPlugin(name).isEnabled()) {
                 return true;
             } else {
+
                 if (!warned.contains(name)) {
                     warned.add(name);
                     StaticMethods.log("&c" + name + " is hooked, but not enabled anymore.");
                 }
-
                 return false;
             }
         }
@@ -37,21 +40,26 @@ public class Compatibility {
     }
 
     public static boolean hookPlugin(String name, String min, String max) {
+
         Plugin hook = Bukkit.getPluginManager().getPlugin(name);
 
         if (hook != null) {
+
             String rawVersion = hook.getDescription().getVersion();
             String[] versionPart = rawVersion.split("\\-");
             String version = versionPart[0];
 
             if (isSupported(version, min, max)) {
+
                 if (!hooked.containsKey(name)) {
                     hooked.put(name, hook);
                     return true;
                 } else {
                     return false;
                 }
+
             } else {
+
                 StaticMethods.log("&c" + name + " v" + version + " is unknown or unsupported.");
                 StaticMethods.log("&cAttempting to hook anyway. There may be errors.");
 
@@ -77,6 +85,7 @@ public class Compatibility {
     }
 
     public static boolean isSupported(String version, String min, String max) {
+
         try {
             return compareVersions(version, min) >= 0 && compareVersions(version, max) <= 0;
         } catch (Exception ignored) {
@@ -85,6 +94,7 @@ public class Compatibility {
     }
 
     public static Integer compareVersions(String version, String compareTo) {
+
         String[] versionString = version.split("\\.");
         String[] compareToString = compareTo.split("\\.");
 

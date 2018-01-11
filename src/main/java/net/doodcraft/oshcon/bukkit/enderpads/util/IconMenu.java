@@ -18,14 +18,14 @@ import java.util.List;
 
 // CREDIT: https://bukkit.org/members/ultimate_n00b.90707285/
 public class IconMenu implements Listener {
+
     private String name;
     private int size;
-    private onClick click;
-    List<String> viewing = new ArrayList<String>();
-
+    private OnClick click;
+    private List<String> viewing = new ArrayList<String>();
     private ItemStack[] items;
 
-    public IconMenu(String name, int size, onClick click) {
+    public IconMenu(String name, int size, OnClick click) {
         this.name = name;
         this.size = size * 9;
         items = new ItemStack[this.size];
@@ -96,7 +96,7 @@ public class IconMenu implements Listener {
         return new Row(row, items);
     }
 
-    public interface onClick {
+    public interface OnClick {
         public abstract boolean click(Player clicker, IconMenu menu, Row row, int slot, ItemStack item);
     }
 

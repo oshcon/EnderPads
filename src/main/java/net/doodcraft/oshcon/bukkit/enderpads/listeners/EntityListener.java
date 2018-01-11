@@ -1,7 +1,16 @@
 package net.doodcraft.oshcon.bukkit.enderpads.listeners;
 
+import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPad;
 import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPadAPI;
+import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
+import net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Creature;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.EntityBlockFormEvent;
@@ -9,7 +18,13 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class EntityListener implements Listener {
+
+    public static Map<Integer, Long> entityCooldowns = new HashMap<>();
+
     @EventHandler(ignoreCancelled = true)
     public void onChange(EntityChangeBlockEvent event) {
         EnderPadAPI.runTelepadCheck(event.getBlock(), false);
@@ -29,6 +44,61 @@ public class EntityListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntityInteract(EntityInteractEvent event) {
-        // todo: Add entity teleportation support.
+
+        Entity entity = event.getEntity();
+        Block clicked = event.getBlock();
+        Material type = clicked.getType();
+
+        if (!(entity instanceof Player)) {
+
+            if (entity instanceof Creature) {
+                if (!Settings.teleportMobs) {
+                    return;
+                }
+            }
+
+            if (entity instanceof Item) {
+                if (!Settings.teleportItems) {
+                    return;
+                }
+            }
+
+            if (EnderPadAPI.isValidPlate(type)) {
+
+                Block centerBlock = event.getBlock().getRelative(BlockFace.DOWN);
+                EnderPad enderPad = new EnderPad(centerBlock.getLocation());
+
+                if (enderPad.isValid()) {
+
+                    if (entityCooldowns.containsKey(entity.getEntityId())) {
+
+                        if ((System.currentTimeMillis() - entityCooldowns.get(entity.getEntityId()) > (Settings.playerCooldown * 1000))) {
+
+                            if (entity.getPassenger() != null) {
+                                // todo: passengers
+                                StaticMethods.debug("Teleporting entities with passengers is not yet supported.");
+                                return;
+                            }
+
+                            EnderPadAPI.teleportEntity(enderPad, entity);
+                        }
+
+                    } else {
+
+                        if (entity.getPassenger() != null) {
+                            // todo: passengers
+                            StaticMethods.debug("Teleporting entities with passengers is not yet supported.");
+                            return;
+                        }
+
+                        EnderPadAPI.teleportEntity(enderPad, entity);
+                    }
+
+                } else {
+
+                    enderPad.delete(null);
+                }
+            }
+        }
     }
 }

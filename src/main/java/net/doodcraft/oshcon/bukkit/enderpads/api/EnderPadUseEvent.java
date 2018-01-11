@@ -6,6 +6,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 public class EnderPadUseEvent extends Event implements Cancellable {
+
     private static final HandlerList handlers = new HandlerList();
 
     private Entity entity;

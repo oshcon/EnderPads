@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Settings {
+
     public static String version;
     public static Boolean colorfulLogging;
     public static Boolean debug;
@@ -21,8 +22,9 @@ public class Settings {
     public static List<String> blackListedWorlds;
     public static Boolean safeTeleport;
     public static int playerCooldown;
+    public static boolean teleportMobs;
+    public static boolean teleportItems;
 
-    // EFFECTS
     public static Boolean lightningCreate;
     public static Boolean lightningDestroy;
     public static Boolean lightningUse;
@@ -69,8 +71,9 @@ public class Settings {
         blackListedWorlds.add("another_disabled_world");
         safeTeleport = true;
         playerCooldown = 6;
+        teleportMobs = true;
+        teleportItems = true;
 
-        // EFFECTS
         lightningCreate = true;
         lightningDestroy = true;
         lightningUse = false;
@@ -82,6 +85,7 @@ public class Settings {
         warpParticlesDestination = true;
         soundsFrom = true;
         soundsTo = true;
+
         if (Compatibility.isSupported(EnderPadsPlugin.version, "1.9", "2.0")) {
             soundFrom = "ENTITY_ENDERMEN_TELEPORT-1-1.35";
             soundTo = "ENTITY_ENDERMEN_TELEPORT-1-1.45";
@@ -121,8 +125,9 @@ public class Settings {
         config.add("CenterMaterial", centerMaterial);
         config.add("Blacklist.Materials", blackListedBlocks);
         config.add("Blacklist.Worlds", blackListedWorlds);
+        config.add("AllowEntities.Mobs", teleportMobs);
+        config.add("AllowEntities.Items", teleportItems);
 
-        // EFFECTS
         config.add("Effects.Lightning.OnCreate", lightningCreate);
         config.add("Effects.Lightning.OnDestroy", lightningDestroy);
         config.add("Effects.Lightning.OnUse", lightningUse);
@@ -175,8 +180,9 @@ public class Settings {
         centerMaterial = config.getString("CenterMaterial");
         blackListedBlocks = config.getStringList("Blacklist.Materials");
         blackListedWorlds = config.getStringList("Blacklist.Worlds");
+        teleportMobs = config.getBoolean("AllowEntities.Mobs");
+        teleportItems = config.getBoolean("AllowEntities.Items");
 
-        // EFFECTS
         lightningCreate = config.getBoolean("Effects.Lightning.OnCreate");
         lightningDestroy = config.getBoolean("Effects.Lightning.OnDestroy");
         lightningUse = config.getBoolean("Effects.Lightning.OnUse");
@@ -213,10 +219,12 @@ public class Settings {
     }
 
     public static boolean reload() {
+
         ConfigurationReloadEvent event = new ConfigurationReloadEvent(EnderPadsPlugin.plugin);
         Bukkit.getPluginManager().callEvent(event);
 
         if (!event.isCancelled()) {
+
             try {
                 Configuration config = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "config.yml");
                 Configuration locale = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "locale.yml");
@@ -230,13 +238,16 @@ public class Settings {
                 ex.printStackTrace();
                 return true;
             }
+
         } else {
+
             StaticMethods.debug("ConfigurationReloadEvent was cancelled.");
             return false;
         }
     }
 
     private static void update() {
+
         String version = EnderPadsPlugin.plugin.getDescription().getVersion();
 
         Configuration config = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "config.yml");
@@ -244,6 +255,7 @@ public class Settings {
 
         // 0.3.2-beta, the first config update. Check if General.Version is null to determine if it is needed.
         if (config.getString("General.Version") == null) {
+
             try {
                 noPermission = locale.getString("General.NoPermission");
                 atMaximum = locale.getString("AtMaximum");
@@ -258,7 +270,7 @@ public class Settings {
 
                 locale.save();
 
-                config.add("General.Version", "0.3.4-beta");
+                config.add("General.Version", version);
                 config.save();
 
                 setNewLocaleValues(locale);
@@ -271,6 +283,7 @@ public class Settings {
         }
 
         if (!config.getString("General.Version").equals(version)) {
+
             // Post 0.3.2-beta updates will be performed here.
             // REMINDER:
             // Config/Locale updates changes should be kept to a minimum to decrease general confusion for users.

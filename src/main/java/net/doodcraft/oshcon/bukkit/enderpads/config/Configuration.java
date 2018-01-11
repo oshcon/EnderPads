@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-@SuppressWarnings("ALL")
 public class Configuration {
+
     private File file = null;
     private YamlConfiguration yaml = new YamlConfiguration();
 

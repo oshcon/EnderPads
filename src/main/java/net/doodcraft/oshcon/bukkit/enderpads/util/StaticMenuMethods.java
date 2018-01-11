@@ -5,10 +5,7 @@ import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPad;
 import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPadAPI;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Configuration;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -20,6 +17,7 @@ import java.util.*;
 public class StaticMenuMethods {
 
     public static void openPlayerList(final Player player, final int page) {
+
         Bukkit.getScheduler().runTaskAsynchronously(EnderPadsPlugin.plugin, new Runnable() {
             @Override
             public void run() {
@@ -36,7 +34,7 @@ public class StaticMenuMethods {
 
                 int pages = (int) Math.ceil((double)size/27);
 
-                IconMenu menu = new IconMenu(StaticMethods.addColor("&8EnderPad Owners &8[&5" + (page + 1) + "&8/&5" + pages + "&8]"), 4, new IconMenu.onClick() {
+                IconMenu menu = new IconMenu(StaticMethods.addColor("&8EnderPad Owners &8[&5" + (page + 1) + "&8/&5" + pages + "&8]"), 4, new IconMenu.OnClick() {
                     @Override
                     public boolean click(Player p, IconMenu menu, IconMenu.Row row, int slot, ItemStack item) {
                         if (item.getType().equals(Material.SKULL_ITEM)) {
@@ -111,25 +109,36 @@ public class StaticMenuMethods {
 
                 int pages = (int) Math.ceil((double)size/27);
 
-                IconMenu menu = new IconMenu(StaticMethods.addColor("&8Search by Player [&5" + String.valueOf(page + 1) + "&8/&5" + pages + "&8]"), 4, new IconMenu.onClick() {
+                IconMenu menu = new IconMenu(StaticMethods.addColor("&8Search by Player [&5" + String.valueOf(page + 1) + "&8/&5" + pages + "&8]"), 4, new IconMenu.OnClick() {
                     @Override
                     public boolean click(Player p, IconMenu menu, IconMenu.Row row, int slot, ItemStack item) {
+
                         if (item.getType().equals(Material.valueOf(Settings.centerMaterial.toUpperCase().split("~")[0]))) {
                             closeMenu(player, menu);
-                            openPadOptions(player, EnderPadAPI.getPadFromID(item.getItemMeta().getDisplayName()));
+                            openPadOptions(player, EnderPadAPI.getPadFromID(ChatColor.stripColor(item.getItemMeta().getDisplayName())));
                         }
+
                         if (item.getType().equals(Material.BLAZE_POWDER)) {
                             closeMenu(player, menu);
                         }
+
                         if (item.getType().equals(Material.PAPER)) {
                             closeMenu(player, menu);
                             openPadListPage(player, uuid, Integer.valueOf(ChatColor.stripColor(item.getItemMeta().getLore().get(0))) - 1);
                         }
+
                         if (item.getType().equals(Material.TNT)) {
+
                             closeMenu(player, menu);
-                            // todo
-                            player.sendMessage(StaticMethods.addColor(Settings.pluginPrefix + " Not yet implemented..."));
+
+                            for (EnderPad pad : getCachedPads(player.getUniqueId())) {
+                                EnderPad d = EnderPadAPI.getPadFromLocation(pad.getLocation());
+                                if (d != null && d.isValid()) {
+                                    d.delete(null);
+                                }
+                            }
                         }
+
                         return true;
                     }
                 });
@@ -190,25 +199,35 @@ public class StaticMenuMethods {
 
                 int pages = (int) Math.ceil((double)size/27);
 
-                IconMenu menu = new IconMenu(StaticMethods.addColor("&8Search by LinkID [&5" + String.valueOf(page + 1) + "&8/&5" + pages + "&8]"), 4, new IconMenu.onClick() {
+                IconMenu menu = new IconMenu(StaticMethods.addColor("&8Search by LinkID [&5" + String.valueOf(page + 1) + "&8/&5" + pages + "&8]"), 4, new IconMenu.OnClick() {
                     @Override
                     public boolean click(Player p, IconMenu menu, IconMenu.Row row, int slot, ItemStack item) {
+
                         if (item.getType().equals(Material.valueOf(Settings.centerMaterial.toUpperCase().split("~")[0]))) {
                             closeMenu(player, menu);
                             openPadOptions(player, EnderPadAPI.getPadFromID(item.getItemMeta().getDisplayName()));
                         }
+
                         if (item.getType().equals(Material.BLAZE_POWDER)) {
                             closeMenu(player, menu);
                         }
+
                         if (item.getType().equals(Material.PAPER)) {
                             closeMenu(player, menu);
                             openPadListPageByLink(player, link, Integer.valueOf(ChatColor.stripColor(item.getItemMeta().getLore().get(0))) - 1);
                         }
+
                         if (item.getType().equals(Material.TNT)) {
                             closeMenu(player, menu);
-                            // todo
-                            player.sendMessage(StaticMethods.addColor(Settings.pluginPrefix + " Not yet implemented..."));
+
+                            for (EnderPad pad : getCachedPadsByLink(link)) {
+                                EnderPad d = EnderPadAPI.getPadFromLocation(pad.getLocation());
+                                if (d != null && d.isValid()) {
+                                    d.delete(null);
+                                }
+                            }
                         }
+
                         return true;
                     }
                 });
@@ -246,44 +265,55 @@ public class StaticMenuMethods {
     }
 
     public static void openPadOptions(final Player player, final EnderPad pad) {
+
         if (pad == null) {
             player.sendMessage(StaticMethods.addColor(Settings.pluginPrefix + " &cThat EnderPad no longer exists!"));
             return;
         }
+
         Bukkit.getScheduler().runTaskAsynchronously(EnderPadsPlugin.plugin, new Runnable() {
             @Override
             public void run() {
-                IconMenu menu = new IconMenu(StaticMethods.addColor("&8" + pad.getPadId()), 2, new IconMenu.onClick() {
+                IconMenu menu = new IconMenu(StaticMethods.addColor("&8" + pad.getPadId()), 2, new IconMenu.OnClick() {
                     @Override
                     public boolean click(Player p, IconMenu menu, IconMenu.Row row, int slot, ItemStack item) {
+
                         if (item.getType().equals(Material.valueOf(Settings.centerMaterial.toUpperCase().split("~")[0]))) {
                             closeMenu(player, menu);
                             openPadOptions(player, EnderPadAPI.getPadFromID(item.getItemMeta().getDisplayName()));
                         }
+
                         if (item.getType().equals(Material.ENDER_PEARL)) {
                             closeMenu(player, menu);
-                            Location to = pad.getLocation().add(0.5, 1, 0.5);
+                            Location to = pad.getLocation();
                             to.setPitch(player.getLocation().getPitch());
                             to.setYaw(player.getLocation().getYaw());
                             player.teleport(to);
                             EnderPadsPlugin.playerCooldowns.put(player.getName(), System.currentTimeMillis());
                         }
+
                         if (item.getType().equals(Material.EYE_OF_ENDER)) {
                             closeMenu(player, menu);
                             openPadListPageByLink(player, pad.getLinkId(), 0);
                         }
+
                         if (item.getType().equals(Material.SKULL_ITEM)) {
                             closeMenu(player, menu);
                             openPadListPage(player, pad.getOwnerUUID(), 0);
                         }
+
                         if (item.getType().equals(Material.TNT)) {
                             closeMenu(player, menu);
-                            // todo
-                            player.sendMessage(StaticMethods.addColor(Settings.pluginPrefix + " Not yet implemented..."));
+                            EnderPad d = EnderPadAPI.getPadFromLocation(pad.getLocation());
+                            if (d != null && d.isValid()) {
+                                d.delete(null);
+                            }
                         }
+
                         if (item.getType().equals(Material.BLAZE_POWDER)) {
                             closeMenu(player, menu);
                         }
+
                         return true;
                     }
                 });
@@ -305,6 +335,7 @@ public class StaticMenuMethods {
     }
 
     public static void closeMenu(Player player, IconMenu menu) {
+        player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
         menu.close(player);
     }
 
@@ -340,7 +371,6 @@ public class StaticMenuMethods {
             return Collections.emptyList();
         }
 
-        // toIndex exclusive
         return sourceList.subList(fromIndex, Math.min(fromIndex + pageSize, sourceList.size()));
     }
 }

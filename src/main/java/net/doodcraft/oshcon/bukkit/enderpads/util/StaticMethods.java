@@ -15,9 +15,10 @@ import java.util.logging.Logger;
 
 public class StaticMethods {
 
-    public static boolean PRE_19 = true;
+    private static boolean PRE_19 = true;
 
     public static boolean isVanished(Player player) {
+
         if (player == null) {
             return false;
         }
@@ -35,11 +36,14 @@ public class StaticMethods {
             return event.getHand().equals(EquipmentSlot.valueOf("OFF_HAND"));
         }
 
-        // Maintain compatibility with versions prior to the combat update.
+        // Maintain compatibility with versions prior to the 1.9 combat update.
         if (Compatibility.isSupported(EnderPadsPlugin.version, "1.9", "2.0")) {
+
             PRE_19 = false;
             return event.getHand().equals(EquipmentSlot.valueOf("OFF_HAND"));
+
         } else {
+
             try {
                 PRE_19 = true;
                 return event.getHand().equals(EquipmentSlot.valueOf("OFF_HAND"));
@@ -50,26 +54,23 @@ public class StaticMethods {
     }
 
     public static Boolean hasPermission(Player player, String node, Boolean sendError) {
-        if (player.isOp()) {
+
+        if (PermissionCache.hasPermission(player.getUniqueId(), node)) {
+
             return true;
-        }
 
-        if (player.hasPermission(EnderPadsPlugin.plugin.getName().toLowerCase() + ".*")) {
-            return true;
-        }
+        } else {
 
-        if (player.hasPermission(node)) {
-            return true;
-        }
+            if (sendError) {
+                player.sendMessage(StringParser.parse(Settings.noPermission, null, null, null, false, false));
+            }
 
-        if (sendError) {
-            player.sendMessage(StringParser.parse(Settings.noPermission, null, null, null, false, false));
+            return false;
         }
-
-        return false;
     }
 
     public static void log(String message) {
+
         try {
             message = Settings.pluginPrefix + " &r" + message;
             sendConsole(message);
@@ -80,6 +81,7 @@ public class StaticMethods {
     }
 
     public static void debug(String message) {
+
         try {
             if (Settings.debug) {
                 message = "&8[&dDEBUG&8] &e" + message;
@@ -92,6 +94,7 @@ public class StaticMethods {
     }
 
     private static void sendConsole(String message) {
+
         ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
 
         try {
@@ -110,6 +113,7 @@ public class StaticMethods {
     }
 
     private static String removeColor(String message) {
+        // This strips the color and formatting codes for us.
         message = addColor(message);
         return ChatColor.stripColor(message);
     }

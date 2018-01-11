@@ -4,6 +4,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 public class AddToMemoryEvent extends Event {
+
     private static final HandlerList handlers = new HandlerList();
     private EnderPad enderPad;
 

@@ -4,8 +4,12 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 public class BlockHelper {
+
+    // todo: data values will be removed in 1.13. Find an alternative asap.
+
     // If true, we ignore the data value for the block.
     public static boolean isDirectional(Material material) {
+
         for (directionalBlocks value : directionalBlocks.values()) {
             if (material.toString().equals(value.name())) {
                 return true;
@@ -17,6 +21,7 @@ public class BlockHelper {
 
     // If true, we ignore the data value for the block and fix the name.
     public static boolean isDual(Material material) {
+
         for (dualBlocks value : dualBlocks.values()) {
             if (material.toString().equals(value.name())) {
                 return true;
@@ -29,6 +34,7 @@ public class BlockHelper {
     // If true, we need to discriminate the data to keep for the block. Variants should always also be directional.
     // If the block is only a variant (maybe in the future), then we don't need to do anything to it.
     public static boolean isVariant(Material material) {
+
         for (variantBlocks value : variantBlocks.values()) {
             if (material.toString().equals(value.name())) {
                 return true;
@@ -43,7 +49,9 @@ public class BlockHelper {
     }
 
     public static String fixDual(Block block) {
+
         if (isDual(block.getType())) {
+
             if (block.getType() == Material.GLOWING_REDSTONE_ORE) {
                 return "REDSTONE_ORE";
             }
@@ -61,9 +69,13 @@ public class BlockHelper {
     }
 
     public static byte fixVariant(Block block) {
+
         // Check for variant first, then check directional.
+
         if (isVariant(block.getType())) {
+
             if (block.getType() == Material.QUARTZ_BLOCK) {
+
                 if (block.getData() == 0) {
                     return 0;
                 }
@@ -108,9 +120,11 @@ public class BlockHelper {
     }
 
     public static byte fixLog(Block block) {
+
         byte data = block.getData();
 
         if (block.getType().equals(Material.LOG)) {
+
             if (data == 0 || data == 4 || data == 8) {
                 return 0;
             }
@@ -129,6 +143,7 @@ public class BlockHelper {
         }
 
         if (block.getType().equals(Material.LOG_2)) {
+
             if (data == 0 || data == 4 || data == 8) {
                 return 0;
             }

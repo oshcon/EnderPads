@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.List;
 
 public class PlayerListener implements Listener {
+
     @EventHandler(ignoreCancelled = true)
     public void onInteract(PlayerInteractEvent event) {
 
@@ -64,6 +65,7 @@ public class PlayerListener implements Listener {
                         String linkId = enderPad.getLinkId();
 
                         if (StaticMethods.hasPermission(player, "enderpads.command.list", false)) {
+
                             if (player.isSneaking()) {
                                 StaticMenuMethods.openPadListPageByLink(player, linkId, 0);
                                 event.setCancelled(true);
@@ -88,7 +90,9 @@ public class PlayerListener implements Listener {
                         }
 
                         if (StaticMethods.hasPermission(player, "enderpads.seeinfo.owner", false)) {
+
                             if (Bukkit.getPlayer(enderPad.getOwnerUUID()) != null) {
+
                                 if (Bukkit.getPlayer(enderPad.getOwnerUUID()).isOnline()) {
                                     player.sendMessage(StringParser.parse(Settings.owner, null, enderPad, enderPad.getOwnerName(), false, true));
                                     return;
@@ -107,20 +111,21 @@ public class PlayerListener implements Listener {
             if (EnderPadAPI.isValidPlate(type)) {
 
                 Block centerBlock = event.getClickedBlock().getRelative(BlockFace.DOWN);
-                EnderPad enderPad = new EnderPad(centerBlock.getLocation());
 
-                if (enderPad.isValid()) {
+                if (centerBlock.getType().equals(Material.valueOf(Settings.centerMaterial.split("~")[0].toUpperCase()))) {
 
                     if (EnderPadsPlugin.playerCooldowns.containsKey(player.getName())) {
 
                         if ((System.currentTimeMillis() - EnderPadsPlugin.playerCooldowns.get(player.getName()) > (Settings.playerCooldown * 1000))) {
 
                             if (player.getPassenger() != null) {
+                                // todo: passengers
                                 StaticMethods.debug("Teleporting entities with passengers is not yet supported.");
                                 return;
                             }
 
                             if (StaticMethods.hasPermission(player, "enderpads.use", true)) {
+                                EnderPad enderPad = EnderPadAPI.getPadFromLocation(centerBlock.getLocation());
                                 EnderPadAPI.teleportEntity(enderPad, player);
                             }
 
@@ -142,16 +147,18 @@ public class PlayerListener implements Listener {
                                 }
                             }
                         }
+
                     } else {
+
                         if (player.getPassenger() != null) {
+                            // todo: passengers
                             StaticMethods.debug("Teleporting entities with passengers is not yet supported.");
                             return;
                         }
 
+                        EnderPad enderPad = EnderPadAPI.getPadFromLocation(centerBlock.getLocation());
                         EnderPadAPI.teleportEntity(enderPad, player);
                     }
-                } else {
-                    enderPad.delete(null);
                 }
             }
         }
@@ -159,6 +166,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlace(BlockPlaceEvent event) {
+
         Player player = event.getPlayer();
 
         if (player == null) {
@@ -201,6 +209,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
+
         Player player = event.getPlayer();
 
         if (player != null) {

@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 
 public class BlockListener implements Listener {
+
     @EventHandler(ignoreCancelled = true)
     public void onBurn(BlockBurnEvent event) {
         EnderPadAPI.destroyCheck(event.getBlock(), null);

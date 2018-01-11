@@ -36,6 +36,7 @@ public class EnderPad {
     private Configuration pads;
 
     public EnderPad(Location location) {
+
         setLocation(location);
         setPadId();
 
@@ -50,6 +51,7 @@ public class EnderPad {
     }
 
     public EnderPad(Location location, Player player) {
+
         setLocation(location);
         setPadId();
         setOwnerUUID(player);

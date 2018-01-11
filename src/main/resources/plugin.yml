@@ -18,6 +18,9 @@ permissions:
   enderpads.command.reload:
     description: Allows players to use /enderpads reload
     default: OP
+  enderpads.command.list:
+    description: Allows players to use /enderpads list
+    default: OP
   enderpads.use:
     description: Allows players to use and construct EnderPads
     default: true
