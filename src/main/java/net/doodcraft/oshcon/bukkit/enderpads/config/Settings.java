@@ -15,6 +15,7 @@ public class Settings {
     public static String version;
     public static Boolean colorfulLogging;
     public static Boolean debug;
+    public static boolean enablePsas;
     public static Boolean logUse;
     public static int defaultMax;
     public static String centerMaterial;
@@ -95,6 +96,7 @@ public class Settings {
         colorfulLogging = true;
         debug = false;
         logUse = true;
+        enablePsas = true;
         defaultMax = 6;
         centerMaterial = "OBSIDIAN~0";
         blackListedBlocks = new ArrayList<>();
@@ -186,6 +188,7 @@ public class Settings {
 
         config.add("General.ColorfulLogging", colorfulLogging);
         config.add("General.DebugMessages", debug);
+        config.add("General.PublicServiceAnnouncements", enablePsas);
         config.add("LogUse", logUse);
         config.add("Cooldown", playerCooldown);
         config.add("SkipBlockedPads", safeTeleport);
@@ -275,6 +278,7 @@ public class Settings {
         version = config.getString("General.Version");
         colorfulLogging = config.getBoolean("General.ColorfulLogging");
         debug = config.getBoolean("General.DebugMessages");
+        enablePsas = config.getBoolean("General.PublicServiceAnnouncements");
         logUse = config.getBoolean("LogUse");
         playerCooldown = config.getInteger("Cooldown");
         safeTeleport = config.getBoolean("SkipBlockedPads");

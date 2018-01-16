@@ -44,11 +44,13 @@ public class EnderPadsPlugin extends JavaPlugin {
         Settings.setupDefaults();
 
         if (!Compatibility.isSupported(version, "1.7.10", "1.12.2")) {
-            StaticMethods.log("&cThis version of EnderPads has not been tested with this version of Minecraft. Support may not be given if there are errors. Avoid using this in production. An update is already likely underway and will release soon. Thank you for your patience!");
+            StaticMethods.log("&c[PSA]: This version of EnderPads has not been tested with this version of Minecraft. Support may not be given if there are errors. Avoid using this in production. An update is already likely underway and will release soon. Thank you for your patience!");
         }
 
-        if (version.equals("1.12")) {
-            StaticMethods.log("&c[PSA]: &eThere is a game-breaking bug in 1.12 with the crafting guide. Players can DUPLICATE items effortlessly. Consider updating your server NOW.");
+        if (Settings.enablePsas) {
+            if (version.equals("1.12")) {
+                StaticMethods.log("&c[PSA]: &eThere is a game-breaking bug in 1.12 with the crafting guide. Players can DUPLICATE items without being detected. Consider updating your server NOW.");
+            }
         }
 
         Compatibility.checkHooks();
