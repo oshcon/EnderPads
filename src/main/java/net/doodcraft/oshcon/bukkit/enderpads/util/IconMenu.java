@@ -21,11 +21,11 @@ public class IconMenu implements Listener {
 
     private String name;
     private int size;
-    private OnClick click;
+    private onClick click;
     private List<String> viewing = new ArrayList<String>();
     private ItemStack[] items;
 
-    public IconMenu(String name, int size, OnClick click) {
+    public IconMenu(String name, int size, onClick click) {
         this.name = name;
         this.size = size * 9;
         items = new ItemStack[this.size];
@@ -96,7 +96,7 @@ public class IconMenu implements Listener {
         return new Row(row, items);
     }
 
-    public interface OnClick {
+    public interface onClick {
         public abstract boolean click(Player clicker, IconMenu menu, Row row, int slot, ItemStack item);
     }
 

@@ -34,7 +34,7 @@ public class StaticMenuMethods {
 
                 int pages = (int) Math.ceil((double)size/27);
 
-                IconMenu menu = new IconMenu(StaticMethods.addColor("&8EnderPad Owners &8[&5" + (page + 1) + "&8/&5" + pages + "&8]"), 4, new IconMenu.OnClick() {
+                IconMenu menu = new IconMenu(StaticMethods.addColor("&8EnderPad Owners &8[&5" + (page + 1) + "&8/&5" + pages + "&8]"), 4, new IconMenu.onClick() {
                     @Override
                     public boolean click(Player p, IconMenu menu, IconMenu.Row row, int slot, ItemStack item) {
                         if (item.getType().equals(Material.SKULL_ITEM)) {
@@ -109,7 +109,7 @@ public class StaticMenuMethods {
 
                 int pages = (int) Math.ceil((double)size/27);
 
-                IconMenu menu = new IconMenu(StaticMethods.addColor("&8Search by Player [&5" + String.valueOf(page + 1) + "&8/&5" + pages + "&8]"), 4, new IconMenu.OnClick() {
+                IconMenu menu = new IconMenu(StaticMethods.addColor("&8Search by Player [&5" + String.valueOf(page + 1) + "&8/&5" + pages + "&8]"), 4, new IconMenu.onClick() {
                     @Override
                     public boolean click(Player p, IconMenu menu, IconMenu.Row row, int slot, ItemStack item) {
 
@@ -199,7 +199,7 @@ public class StaticMenuMethods {
 
                 int pages = (int) Math.ceil((double)size/27);
 
-                IconMenu menu = new IconMenu(StaticMethods.addColor("&8Search by LinkID [&5" + String.valueOf(page + 1) + "&8/&5" + pages + "&8]"), 4, new IconMenu.OnClick() {
+                IconMenu menu = new IconMenu(StaticMethods.addColor("&8Search by LinkID [&5" + String.valueOf(page + 1) + "&8/&5" + pages + "&8]"), 4, new IconMenu.onClick() {
                     @Override
                     public boolean click(Player p, IconMenu menu, IconMenu.Row row, int slot, ItemStack item) {
 
@@ -274,7 +274,7 @@ public class StaticMenuMethods {
         Bukkit.getScheduler().runTaskAsynchronously(EnderPadsPlugin.plugin, new Runnable() {
             @Override
             public void run() {
-                IconMenu menu = new IconMenu(StaticMethods.addColor("&8" + pad.getPadId()), 2, new IconMenu.OnClick() {
+                IconMenu menu = new IconMenu(StaticMethods.addColor("&8" + pad.getPadId()), 2, new IconMenu.onClick() {
                     @Override
                     public boolean click(Player p, IconMenu menu, IconMenu.Row row, int slot, ItemStack item) {
 

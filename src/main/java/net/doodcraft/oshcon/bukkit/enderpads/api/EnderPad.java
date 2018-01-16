@@ -3,10 +3,7 @@ package net.doodcraft.oshcon.bukkit.enderpads.api;
 import net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Configuration;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
-import net.doodcraft.oshcon.bukkit.enderpads.util.NameCache;
-import net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods;
-import net.doodcraft.oshcon.bukkit.enderpads.util.StringParser;
-import net.doodcraft.oshcon.bukkit.enderpads.util.UUIDCache;
+import net.doodcraft.oshcon.bukkit.enderpads.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -324,9 +321,9 @@ public class EnderPad {
                         }
 
                         if (size == 1) {
-                            owner.sendMessage(StringParser.parse(Settings.links, null, this, "none", false, false));
+                            owner.sendMessage(StringParser.parse(Settings.links, null, this, Settings.numbersZero, false, false));
                         } else {
-                            owner.sendMessage(StringParser.parse(Settings.links, null, this, String.valueOf(size - 1), true, false));
+                            owner.sendMessage(StringParser.parse(Settings.links, null, this, NumberConverter.convert(size - 1), true, false));
                         }
 
                         max = StaticMethods.addColor(max);
@@ -455,9 +452,9 @@ public class EnderPad {
                         }
 
                         if (size == 1) {
-                            onlineOwner.sendMessage(StringParser.parse(Settings.links, null, this, "none", false, false));
+                            onlineOwner.sendMessage(StringParser.parse(Settings.links, null, this, Settings.numbersZero, false, false));
                         } else {
-                            onlineOwner.sendMessage(StringParser.parse(Settings.links, null, this, String.valueOf(size - 1), true, false));
+                            onlineOwner.sendMessage(StringParser.parse(Settings.links, null, this, NumberConverter.convert(size - 1), true, false));
                         }
 
                         max = StaticMethods.addColor(max);

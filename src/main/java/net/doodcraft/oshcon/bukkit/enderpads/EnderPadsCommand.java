@@ -112,7 +112,6 @@ public class EnderPadsCommand implements CommandExecutor {
         } else {
             StaticMethods.log("&3Valid Commands:");
             StaticMethods.log("&b/enderpads reload: &7Reloads the config and verifies all pad data");
-            StaticMethods.log("&b/enderpads list: &7List a player's EnderPads");
         }
     }
 }

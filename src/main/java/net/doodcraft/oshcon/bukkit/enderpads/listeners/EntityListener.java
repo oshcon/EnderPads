@@ -3,7 +3,6 @@ package net.doodcraft.oshcon.bukkit.enderpads.listeners;
 import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPad;
 import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPadAPI;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
-import net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -74,10 +73,10 @@ public class EntityListener implements Listener {
 
                         if ((System.currentTimeMillis() - entityCooldowns.get(entity.getEntityId()) > (Settings.playerCooldown * 1000))) {
 
-                            if (entity.getPassenger() != null) {
-                                // todo: passengers
-                                StaticMethods.debug("Teleporting entities with passengers is not yet supported.");
-                                return;
+                            if (entity.getPassengers().size() >= 1) {
+                                for (Entity e : entity.getPassengers()) {
+                                    e.eject();
+                                }
                             }
 
                             EnderPadAPI.teleportEntity(enderPad, entity);
@@ -85,10 +84,10 @@ public class EntityListener implements Listener {
 
                     } else {
 
-                        if (entity.getPassenger() != null) {
-                            // todo: passengers
-                            StaticMethods.debug("Teleporting entities with passengers is not yet supported.");
-                            return;
+                        if (entity.getPassengers().size() >= 1) {
+                            for (Entity e : entity.getPassengers()) {
+                                e.eject();
+                            }
                         }
 
                         EnderPadAPI.teleportEntity(enderPad, entity);

@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -84,9 +85,9 @@ public class PlayerListener implements Listener {
                         player.sendMessage(StringParser.parse(Settings.enderPad, null, enderPad, null, false, false));
 
                         if (linked.size() == 1) {
-                            player.sendMessage(StringParser.parse(Settings.links, null, enderPad, "none", false, false));
+                            player.sendMessage(StringParser.parse(Settings.links, null, enderPad, Settings.numbersZero, false, false));
                         } else {
-                            player.sendMessage(StringParser.parse(Settings.links, null, enderPad, String.valueOf((linked.size() - 1)), false, false));
+                            player.sendMessage(StringParser.parse(Settings.links, null, enderPad, NumberConverter.convert(linked.size() - 1), false, false));
                         }
 
                         if (StaticMethods.hasPermission(player, "enderpads.seeinfo.owner", false)) {
@@ -118,10 +119,10 @@ public class PlayerListener implements Listener {
 
                         if ((System.currentTimeMillis() - EnderPadsPlugin.playerCooldowns.get(player.getName()) > (Settings.playerCooldown * 1000))) {
 
-                            if (player.getPassenger() != null) {
-                                // todo: passengers
-                                StaticMethods.debug("Teleporting entities with passengers is not yet supported.");
-                                return;
+                            if (player.getPassengers().size() >= 1) {
+                                for (Entity e : player.getPassengers()) {
+                                    e.eject();
+                                }
                             }
 
                             if (StaticMethods.hasPermission(player, "enderpads.use", true)) {
@@ -150,10 +151,10 @@ public class PlayerListener implements Listener {
 
                     } else {
 
-                        if (player.getPassenger() != null) {
-                            // todo: passengers
-                            StaticMethods.debug("Teleporting entities with passengers is not yet supported.");
-                            return;
+                        if (player.getPassengers().size() >= 1) {
+                            for (Entity e : player.getPassengers()) {
+                                e.eject();
+                            }
                         }
 
                         EnderPad enderPad = EnderPadAPI.getPadFromLocation(centerBlock.getLocation());

@@ -57,6 +57,40 @@ public class Settings {
     public static String online;
     public static String offline;
 
+    public static String numbersNegative;
+    public static String numbersHundred;
+    public static String numbersThousand;
+    public static String numbersMillion;
+    public static String numbersBillion;
+    public static String numbersZero;
+    public static String numbersOne;
+    public static String numbersTwo;
+    public static String numbersThree;
+    public static String numbersFour;
+    public static String numbersFive;
+    public static String numbersSix;
+    public static String numbersSeven;
+    public static String numbersEight;
+    public static String numbersNine;
+    public static String numbersTen;
+    public static String numbersEleven;
+    public static String numbersTwelve;
+    public static String numbersThirteen;
+    public static String numbersFourteen;
+    public static String numbersFifteen;
+    public static String numbersSixteen;
+    public static String numbersSeventeen;
+    public static String numbersEighteen;
+    public static String numbersNineteen;
+    public static String numbersTwenty;
+    public static String numbersThirty;
+    public static String numbersForty;
+    public static String numbersFifty;
+    public static String numbersSixty;
+    public static String numbersSeventy;
+    public static String numbersEighty;
+    public static String numbersNinety;
+
     public static void setupDefaults() {
         colorfulLogging = true;
         debug = false;
@@ -113,6 +147,40 @@ public class Settings {
         online = "&a(online)";
         offline = "&c(offline)";
 
+        numbersNegative = "negative";
+        numbersHundred = "hundred";
+        numbersThousand = "thousand";
+        numbersMillion = "million";
+        numbersBillion = "billion";
+        numbersZero = "zero";
+        numbersOne = "one";
+        numbersTwo = "two";
+        numbersThree = "three";
+        numbersFour = "four";
+        numbersFive = "five";
+        numbersSix = "six";
+        numbersSeven = "seven";
+        numbersEight = "eight";
+        numbersNine = "nine";
+        numbersTen = "ten";
+        numbersEleven = "eleven";
+        numbersTwelve = "twelve";
+        numbersThirteen = "thirteen";
+        numbersFourteen = "fourteen";
+        numbersFifteen = "fifteen";
+        numbersSixteen = "sixteen";
+        numbersSeventeen = "seventeen";
+        numbersEighteen = "eighteen";
+        numbersNineteen = "nineteen";
+        numbersTwenty = "twenty";
+        numbersThirty = "thirty";
+        numbersForty = "forty";
+        numbersFifty = "fifty";
+        numbersSixty = "sixty";
+        numbersSeventy = "seventy";
+        numbersEighty = "eighty";
+        numbersNinety = "ninety";
+
         Configuration config = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "config.yml");
         Configuration locale = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "locale.yml");
 
@@ -159,6 +227,40 @@ public class Settings {
         locale.add("EnderPad.Info.Owner", owner);
         locale.add("Variables.Online", online);
         locale.add("Variables.Offline", offline);
+
+        locale.add("Numbers.Negative", numbersNegative);
+        locale.add("Numbers.Hundred", numbersHundred);
+        locale.add("Numbers.Thousand", numbersThousand);
+        locale.add("Numbers.Million", numbersMillion);
+        locale.add("Numbers.Billion", numbersBillion);
+        locale.add("Numbers.Zero", numbersZero);
+        locale.add("Numbers.One", numbersOne);
+        locale.add("Numbers.Two", numbersTwo);
+        locale.add("Numbers.Three", numbersThree);
+        locale.add("Numbers.Four", numbersFour);
+        locale.add("Numbers.Five", numbersFive);
+        locale.add("Numbers.Six", numbersSix);
+        locale.add("Numbers.Seven", numbersSeven);
+        locale.add("Numbers.Eight", numbersEight);
+        locale.add("Numbers.Nine", numbersNine);
+        locale.add("Numbers.Ten", numbersTen);
+        locale.add("Numbers.Eleven", numbersEleven);
+        locale.add("Numbers.Twelve", numbersTwelve);
+        locale.add("Numbers.Thirteen", numbersThirteen);
+        locale.add("Numbers.Fourteen", numbersFourteen);
+        locale.add("Numbers.Fifteen", numbersFifteen);
+        locale.add("Numbers.Sixteen", numbersSixteen);
+        locale.add("Numbers.Seventeen", numbersSeventeen);
+        locale.add("Numbers.Eighteen", numbersEighteen);
+        locale.add("Numbers.Nineteen", numbersNineteen);
+        locale.add("Numbers.Twenty", numbersTwenty);
+        locale.add("Numbers.Thirty", numbersThirty);
+        locale.add("Numbers.Forty", numbersForty);
+        locale.add("Numbers.Fifty", numbersFifty);
+        locale.add("Numbers.Sixty", numbersSixty);
+        locale.add("Numbers.Seventeen", numbersSeventeen);
+        locale.add("Numbers.Eighteen", numbersEighteen);
+        locale.add("Numbers.Nineteen", numbersNineteen);
 
         config.save();
         locale.save();
@@ -216,6 +318,39 @@ public class Settings {
         owner = locale.getString("EnderPad.Info.Owner");
         online = locale.getString("Variables.Online");
         offline = locale.getString("Variables.Offline");
+
+        numbersNegative = locale.getString("Numbers.Negative");
+        numbersHundred = locale.getString("Numbers.Hundred");
+        numbersThousand = locale.getString("Numbers.Thousand");
+        numbersMillion = locale.getString("Numbers.Million");
+        numbersBillion = locale.getString("Numbers.Billion");
+        numbersZero = locale.getString("Numbers.Zero");
+        numbersOne = locale.getString("Numbers.One");
+        numbersTwo = locale.getString("Numbers.Two");
+        numbersThree = locale.getString("Numbers.Three");
+        numbersFour = locale.getString("Numbers.Four");
+        numbersFive = locale.getString("Numbers.Five");
+        numbersSix = locale.getString("Numbers.Six");
+        numbersSeven = locale.getString("Numbers.Seven");
+        numbersEight = locale.getString("Numbers.Eight");
+        numbersNine = locale.getString("Numbers.Nine");
+        numbersTen = locale.getString("Numbers.Ten");
+        numbersEleven = locale.getString("Numbers.Eleven");
+        numbersTwelve = locale.getString("Numbers.Twelve");
+        numbersThirteen = locale.getString("Numbers.Thirteen");
+        numbersFourteen = locale.getString("Numbers.Fourteen");
+        numbersFifteen = locale.getString("Numbers.Fifteen");
+        numbersSixteen = locale.getString("Numbers.Sixteen");
+        numbersEighteen = locale.getString("Numbers.Eighteen");
+        numbersNineteen = locale.getString("Numbers.Nineteen");
+        numbersTwenty = locale.getString("Numbers.Twenty");
+        numbersThirty = locale.getString("Numbers.Thirty");
+        numbersForty = locale.getString("Numbers.Forty");
+        numbersFifty = locale.getString("Numbers.Fifty");
+        numbersSixty = locale.getString("Numbers.Sixty");
+        numbersSeventy = locale.getString("Numbers.Seventy");
+        numbersEighty = locale.getString("Numbers.Eighty");
+        numbersNinety = locale.getString("Numbers.Ninety");
     }
 
     public static boolean reload() {
