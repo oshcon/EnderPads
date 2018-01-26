@@ -1,11 +1,14 @@
-package net.doodcraft.oshcon.bukkit.enderpads.listeners;
+package net.doodcraft.oshcon.bukkit.enderpads.listener;
 
 import net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin;
-import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPad;
-import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPadAPI;
-import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPadClickEvent;
+import net.doodcraft.oshcon.bukkit.enderpads.cache.EnderPadCache;
+import net.doodcraft.oshcon.bukkit.enderpads.cache.PermissionCache;
+import net.doodcraft.oshcon.bukkit.enderpads.cache.UUIDCache;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Configuration;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
+import net.doodcraft.oshcon.bukkit.enderpads.enderpad.EnderPad;
+import net.doodcraft.oshcon.bukkit.enderpads.enderpad.EnderPadMethods;
+import net.doodcraft.oshcon.bukkit.enderpads.event.EnderPadClickEvent;
 import net.doodcraft.oshcon.bukkit.enderpads.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -27,18 +30,16 @@ public class PlayerListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInteract(PlayerInteractEvent event) {
-
         Player player = event.getPlayer();
         Block clicked = event.getClickedBlock();
         Material type = clicked.getType();
 
         if (event.getAction().equals(Action.valueOf("RIGHT_CLICK_BLOCK"))) {
-
-            if (StaticMethods.isOffHandClick(event)) {
+            if (GeneralMethods.isOffHandClick(event)) {
                 return;
             }
 
-            if (EnderPadAPI.isValidPlate(type)) {
+            if (EnderPadMethods.isPlate(type)) {
 
                 EnderPad enderPad = new EnderPad(clicked.getRelative(BlockFace.DOWN).getLocation());
 
@@ -49,12 +50,12 @@ public class PlayerListener implements Listener {
 
                     if (!clickEvent.isCancelled()) {
 
-                        if (!StaticMethods.hasPermission(player, "enderpads.seeinfo", false)) {
+                        if (!PermissionCache.hasPermission(player, "enderpads.seeinfo", false)) {
                             return;
                         }
 
                         if (!UUIDCache.getUniqueID(player.getName()).equals(enderPad.getOwnerUUID())) {
-                            if (!StaticMethods.hasPermission(player, "enderpads.seeinfo.others", false)) {
+                            if (!PermissionCache.hasPermission(player, "enderpads.seeinfo.others", false)) {
                                 return;
                             }
                         }
@@ -63,9 +64,9 @@ public class PlayerListener implements Listener {
                             event.setCancelled(true);
                         }
 
-                        String linkId = enderPad.getLinkId();
+                        String linkId = enderPad.getCurrentLink().toString();
 
-                        if (StaticMethods.hasPermission(player, "enderpads.command.list", false)) {
+                        if (PermissionCache.hasPermission(player, "enderpads.command.list", false)) {
 
                             if (player.isSneaking()) {
                                 StaticMenuMethods.openPadListPageByLink(player, linkId, 0);
@@ -90,7 +91,7 @@ public class PlayerListener implements Listener {
                             player.sendMessage(StringParser.parse(Settings.links, null, enderPad, NumberConverter.convert(linked.size() - 1), false, false));
                         }
 
-                        if (StaticMethods.hasPermission(player, "enderpads.seeinfo.owner", false)) {
+                        if (PermissionCache.hasPermission(player, "enderpads.seeinfo.owner", false)) {
 
                             if (Bukkit.getPlayer(enderPad.getOwnerUUID()) != null) {
 
@@ -108,57 +109,46 @@ public class PlayerListener implements Listener {
         }
 
         if (event.getAction().equals(Action.PHYSICAL)) {
-
-            if (EnderPadAPI.isValidPlate(type)) {
-
+            if (EnderPadMethods.isPlate(type)) {
                 Block centerBlock = event.getClickedBlock().getRelative(BlockFace.DOWN);
-
-                if (centerBlock.getType().equals(Material.valueOf(Settings.centerMaterial.split("~")[0].toUpperCase()))) {
-
+                if (centerBlock.getType().equals(Material.valueOf(Settings.centerMaterial.split("~")[0]))) {
                     if (EnderPadsPlugin.playerCooldowns.containsKey(player.getName())) {
-
                         if ((System.currentTimeMillis() - EnderPadsPlugin.playerCooldowns.get(player.getName()) > (Settings.playerCooldown * 1000))) {
+                            if (PermissionCache.hasPermission(player, "enderpads.use", true)) {
+                                if (player.getPassengers().size() >= 1) {
+                                    for (Entity e : player.getPassengers()) {
+                                        e.eject();
+                                    }
+                                }
 
-                            if (player.getPassengers().size() >= 1) {
-                                for (Entity e : player.getPassengers()) {
-                                    e.eject();
+                                EnderPad enderPad = EnderPadCache.getEnderPad(centerBlock.getLocation());
+                                if (enderPad != null) {
+                                    enderPad.teleportEntity(player);
                                 }
                             }
-
-                            if (StaticMethods.hasPermission(player, "enderpads.use", true)) {
-                                EnderPad enderPad = EnderPadAPI.getPadFromLocation(centerBlock.getLocation());
-                                EnderPadAPI.teleportEntity(enderPad, player);
-                            }
-
                         } else {
-
                             long remaining = (Settings.playerCooldown * 1000) - (System.currentTimeMillis() - EnderPadsPlugin.playerCooldowns.get(player.getName()));
                             long portion = (Settings.playerCooldown * 1000) / 4;
-
                             if (remaining < (Settings.playerCooldown * 1000) - portion) {
-
-                                if (StaticMethods.hasPermission(player, "enderpads.use", true)) {
-
+                                if (PermissionCache.hasPermission(player, "enderpads.use", true)) {
                                     if (!Settings.cooldownMessage.equals(" ") || Settings.cooldownMessage != null) {
-
-                                        if (!StaticMethods.isVanished(player)) {
-                                            ReflectionUtil.sendActionBar(player, StaticMethods.addColor(Settings.cooldownMessage.replaceAll("<remaining>", String.valueOf(remaining))));
+                                        if (!GeneralMethods.isVanished(player)) {
+                                            ReflectionUtil.sendActionBar(player, EnderPadsPlugin.logger.addColor(Settings.cooldownMessage.replaceAll("<remaining>", String.valueOf(remaining))));
                                         }
                                     }
                                 }
                             }
                         }
-
                     } else {
-
                         if (player.getPassengers().size() >= 1) {
                             for (Entity e : player.getPassengers()) {
                                 e.eject();
                             }
                         }
-
-                        EnderPad enderPad = EnderPadAPI.getPadFromLocation(centerBlock.getLocation());
-                        EnderPadAPI.teleportEntity(enderPad, player);
+                        EnderPad enderPad = EnderPadCache.getEnderPad(centerBlock.getLocation());
+                        if (enderPad != null) {
+                            enderPad.teleportEntity(player);
+                        }
                     }
                 }
             }
@@ -167,56 +157,21 @@ public class PlayerListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlace(BlockPlaceEvent event) {
-
         Player player = event.getPlayer();
-
         if (player == null) {
             return;
         }
-
-        Block block = event.getBlock();
-        Material material = block.getType();
-
-        if (BlockHelper.isPhysicsBlock(material)) {
-            return;
-        }
-
-        String valid = Settings.centerMaterial.toUpperCase();
-
-        if (EnderPadAPI.isValidPlate(material)) {
-            Block below = block.getRelative(BlockFace.DOWN);
-            String checkBelow = EnderPadAPI.getBlockString(below);
-
-            if (checkBelow.equals(valid)) {
-                EnderPadAPI.runTelepadCheck(below, player, true);
-            }
-        }
-
-        String check = EnderPadAPI.getBlockString(block);
-
-        if (check.equals(valid)) {
-            EnderPadAPI.runTelepadCheck(block, player, true);
-        }
-
-        for (BlockFace face : EnderPadsPlugin.faces) {
-            Block b = block.getRelative(face);
-            String checkB = EnderPadAPI.getBlockString(b);
-
-            if (checkB.equals(valid)) {
-                EnderPadAPI.runTelepadCheck(b, player, true);
-            }
-        }
+        Block block = event.getBlock().getLocation().getBlock();
+        EnderPadMethods.saveCheck(player, block, true);
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
-
         Player player = event.getPlayer();
-
         if (player != null) {
-            EnderPadAPI.destroyCheck(event.getBlock(), player);
+            EnderPadMethods.deleteCheck(player, event.getBlock(), true);
         } else {
-            EnderPadAPI.destroyCheck(event.getBlock(), null);
+            EnderPadMethods.deleteCheck(null, event.getBlock(), true);
         }
     }
 }

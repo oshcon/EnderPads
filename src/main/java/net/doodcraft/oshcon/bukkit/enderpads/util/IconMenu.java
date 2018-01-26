@@ -96,13 +96,21 @@ public class IconMenu implements Listener {
         return new Row(row, items);
     }
 
+    private ItemStack getItem(ItemStack item, String name, String... lore) {
+        ItemMeta im = item.getItemMeta();
+        im.setDisplayName(name);
+        im.setLore(Arrays.asList(lore));
+        item.setItemMeta(im);
+        return item;
+    }
+
     public interface onClick {
-        public abstract boolean click(Player clicker, IconMenu menu, Row row, int slot, ItemStack item);
+        boolean click(Player clicker, IconMenu menu, Row row, int slot, ItemStack item);
     }
 
     public class Row {
-        private ItemStack[] rowItems = new ItemStack[9];
         int row;
+        private ItemStack[] rowItems = new ItemStack[9];
 
         public Row(int row, ItemStack[] items) {
             this.row = row;
@@ -124,13 +132,5 @@ public class IconMenu implements Listener {
         public int getRow() {
             return row;
         }
-    }
-
-    private ItemStack getItem(ItemStack item, String name, String... lore) {
-        ItemMeta im = item.getItemMeta();
-        im.setDisplayName(name);
-        im.setLore(Arrays.asList(lore));
-        item.setItemMeta(im);
-        return item;
     }
 }

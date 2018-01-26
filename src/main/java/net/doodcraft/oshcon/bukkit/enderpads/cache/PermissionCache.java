@@ -1,8 +1,11 @@
-package net.doodcraft.oshcon.bukkit.enderpads.util;
+package net.doodcraft.oshcon.bukkit.enderpads.cache;
 
 import net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin;
+import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
+import net.doodcraft.oshcon.bukkit.enderpads.util.StringParser;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -33,7 +36,7 @@ public class PermissionCache implements Listener {
             public void run() {
                 removePermission(uuid, node);
             }
-        },18000L);
+        }, 18000L);
 
         return result;
     }
@@ -79,6 +82,22 @@ public class PermissionCache implements Listener {
         }
 
         return false;
+    }
+
+    public static Boolean hasPermission(Player player, String node, Boolean sendError) {
+
+        if (hasPermission(player.getUniqueId(), node)) {
+
+            return true;
+
+        } else {
+
+            if (sendError) {
+                player.sendMessage(StringParser.parse(Settings.noPermission, null, null, null, false, false));
+            }
+
+            return false;
+        }
     }
 
     @EventHandler

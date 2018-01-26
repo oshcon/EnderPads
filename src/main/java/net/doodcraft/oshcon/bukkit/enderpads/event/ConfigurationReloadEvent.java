@@ -1,4 +1,4 @@
-package net.doodcraft.oshcon.bukkit.enderpads.config;
+package net.doodcraft.oshcon.bukkit.enderpads.event;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -15,23 +15,23 @@ public class ConfigurationReloadEvent extends Event {
         this.plugin = plugin;
     }
 
-    public boolean isCancelled() {
-        return cancelled;
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
-    public Plugin getPlugin() {
-        return plugin;
+    public boolean isCancelled() {
+        return cancelled;
     }
 
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
     }
 
-    public HandlerList getHandlers() {
-        return handlers;
+    public Plugin getPlugin() {
+        return plugin;
     }
 
-    public static HandlerList getHandlerList() {
+    public HandlerList getHandlers() {
         return handlers;
     }
 }

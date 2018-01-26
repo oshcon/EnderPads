@@ -1,4 +1,4 @@
-package net.doodcraft.oshcon.bukkit.enderpads.util;
+package net.doodcraft.oshcon.bukkit.enderpads.cache;
 
 import org.bukkit.Bukkit;
 

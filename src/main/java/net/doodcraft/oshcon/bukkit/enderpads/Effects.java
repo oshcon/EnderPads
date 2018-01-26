@@ -3,10 +3,12 @@ package net.doodcraft.oshcon.bukkit.enderpads;
 import de.slikey.effectlib.EffectManager;
 import de.slikey.effectlib.effect.WarpEffect;
 import de.slikey.effectlib.util.ParticleEffect;
-import net.doodcraft.oshcon.bukkit.enderpads.api.*;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
+import net.doodcraft.oshcon.bukkit.enderpads.enderpad.EnderPad;
+import net.doodcraft.oshcon.bukkit.enderpads.event.EnderPadCacheEvent;
+import net.doodcraft.oshcon.bukkit.enderpads.event.EnderPadUseEvent;
 import net.doodcraft.oshcon.bukkit.enderpads.util.Compatibility;
-import net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods;
+import net.doodcraft.oshcon.bukkit.enderpads.util.GeneralMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -27,17 +29,15 @@ public class Effects implements Listener {
     public static boolean NOFIX_1710 = true;
 
     public static void addAll() {
-
         for (EnderPad enderPad : EnderPadsPlugin.enderPads.values()) {
             startPoofEffect(enderPad);
         }
     }
 
     public static void startPoofEffect(EnderPad enderPad) {
+        if (!idleTasks.containsKey(enderPad.getSmallLocation().toString())) {
 
-        if (!idleTasks.containsKey(enderPad.getPadId())) {
-
-            final Location loc = enderPad.getLocation().add(0.5, 1.15, 0.5);
+            final Location loc = enderPad.getBukkitLocation().add(0.5, 1.15, 0.5);
 
             int task = Bukkit.getScheduler().scheduleSyncRepeatingTask(EnderPadsPlugin.plugin, new Runnable() {
                 @Override
@@ -46,16 +46,16 @@ public class Effects implements Listener {
                 }
             }, 10L, 10L);
 
-            idleTasks.put(enderPad.getPadId(), task);
+            idleTasks.put(enderPad.getSmallLocation().toString(), task);
         }
     }
 
     public static void stopPoofEffect(EnderPad enderPad) {
 
-        if (idleTasks.containsKey(enderPad.getPadId())) {
+        if (idleTasks.containsKey(enderPad.getSmallLocation().toString())) {
 
-            Bukkit.getScheduler().cancelTask(idleTasks.get(enderPad.getPadId()));
-            idleTasks.remove(enderPad.getPadId());
+            Bukkit.getScheduler().cancelTask(idleTasks.get(enderPad.getSmallLocation().toString()));
+            idleTasks.remove(enderPad.getSmallLocation().toString());
         }
     }
 
@@ -66,14 +66,14 @@ public class Effects implements Listener {
 
             Player player = (Player) event.getEntity();
 
-            if (net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods.isVanished(player)) {
+            if (GeneralMethods.isVanished(player)) {
                 return;
             }
 
             if (Settings.lightningUse) {
 
-                if (!StaticMethods.isVanished(player)) {
-                    Location loc = event.getDestinationEnderPad().getLocation();
+                if (!GeneralMethods.isVanished(player)) {
+                    Location loc = event.getDestinationEnderPad().getBukkitLocation();
                     loc.getWorld().strikeLightningEffect(loc);
                 }
             }
@@ -90,8 +90,8 @@ public class Effects implements Listener {
                             PotionEffect effect = new PotionEffect(PotionEffectType.getByName(args[0].toUpperCase()), Integer.valueOf(args[1]) * 20, Integer.valueOf(args[2]), Boolean.valueOf(args[3]), Boolean.valueOf(args[4]));
                             player.addPotionEffect(effect);
                         } catch (Exception ex) {
-                            StaticMethods.log("Error applying potion effect: " + args[0]);
-                            StaticMethods.log("Check your configuration for errors.");
+                            EnderPadsPlugin.logger.log("Error applying potion effect: " + args[0]);
+                            EnderPadsPlugin.logger.log("Check your configuration for errors.");
                         }
                     }
 
@@ -100,7 +100,7 @@ public class Effects implements Listener {
                     // todo: Create 1.7.10 add-on addressing incompatibilities
                     // When this problem is addressed, simply set NOFIX_1710 to false
                     if (NOFIX_1710) {
-                        StaticMethods.log("Sorry, PotionEffects are disabled for your Minecraft version. [Compatible: 1.8 and onward]");
+                        EnderPadsPlugin.logger.log("Sorry, PotionEffects are disabled for your Minecraft version. [Compatible: 1.8 and onward]");
                         Settings.potionEffectsEnabled = false;
                     }
                 }
@@ -112,7 +112,7 @@ public class Effects implements Listener {
                 warpEffect.radius = 0.72F;
                 warpEffect.particles = 8;
                 warpEffect.rings = 1;
-                warpEffect.setLocation(event.getOriginEnderPad().getLocation().add(0.5, 1, 0.5));
+                warpEffect.setLocation(event.getOriginEnderPad().getBukkitLocation().add(0.5, 1, 0.5));
                 warpEffect.start();
             }
 
@@ -122,12 +122,12 @@ public class Effects implements Listener {
                 warpEffect.radius = 0.72F;
                 warpEffect.particles = 8;
                 warpEffect.rings = 1;
-                warpEffect.setLocation(event.getDestinationEnderPad().getLocation().add(0.5, 1, 0.5));
+                warpEffect.setLocation(event.getDestinationEnderPad().getBukkitLocation().add(0.5, 1, 0.5));
                 warpEffect.start();
             }
 
-            final Location from = event.getOriginEnderPad().getLocation();
-            final Location to = event.getDestinationEnderPad().getLocation();
+            final Location from = event.getOriginEnderPad().getBukkitLocation();
+            final Location to = event.getDestinationEnderPad().getBukkitLocation();
 
             if (Settings.soundsFrom) {
 
@@ -141,8 +141,8 @@ public class Effects implements Listener {
                         }
                     }, 1L);
                 } catch (Exception ex) {
-                    StaticMethods.log("&cThere was an error getting the from sound in your config.");
-                    StaticMethods.log(ex.getLocalizedMessage());
+                    EnderPadsPlugin.logger.log("&cThere was an error getting the from sound in your config.");
+                    EnderPadsPlugin.logger.log(ex.getLocalizedMessage());
                 }
             }
 
@@ -158,8 +158,8 @@ public class Effects implements Listener {
                         }
                     }, 5L);
                 } catch (Exception ex) {
-                    StaticMethods.log("&cThere was an error getting the to sound in your config.");
-                    StaticMethods.log(ex.getLocalizedMessage());
+                    EnderPadsPlugin.logger.log("&cThere was an error getting the to sound in your config.");
+                    EnderPadsPlugin.logger.log(ex.getLocalizedMessage());
                 }
             }
         } else {
@@ -168,46 +168,33 @@ public class Effects implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onAdd(AddToMemoryEvent event) {
-
+    public void onAdd(EnderPadCacheEvent event) {
         EnderPad enderPad = event.getEnderPad();
-        startPoofEffect(enderPad);
-
-         if (enderPad.isValid() && enderPad.isSaved()) {
-
-            if (Settings.lightningCreate) {
-
-                if (!StaticMethods.isVanished(Bukkit.getPlayer(event.getEnderPad().getOwnerUUID()))) {
-                    Location loc = event.getEnderPad().getLocation();
-                    loc.getWorld().strikeLightningEffect(loc);
+        if (event.hasEffects()) {
+            if (event.isAdding()) {
+                startPoofEffect(enderPad);
+                if (Settings.lightningCreate) {
+                    if (!GeneralMethods.isVanished(Bukkit.getPlayer(event.getEnderPad().getOwnerUUID()))) {
+                        Location loc = event.getEnderPad().getBukkitLocation();
+                        loc.getWorld().strikeLightningEffect(loc);
+                    }
                 }
             }
         }
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onRemove(RemoveFromMemoryEvent event) {
-
+    public void onRemove(EnderPadCacheEvent event) {
         EnderPad enderPad = event.getEnderPad();
-        stopPoofEffect(enderPad);
-    }
-
-    @EventHandler(ignoreCancelled = true)
-    public void onDestroy(EnderPadDestroyEvent event) {
-
-        if (event.getEnderPad().isValid()) {
-
-            if (Settings.lightningDestroy) {
-
-                if (event.hasPlayer()) {
-
-                    if (StaticMethods.isVanished(event.getPlayer())) {
-                        return;
+        if (event.hasEffects()) {
+            if (event.isRemoving()) {
+                stopPoofEffect(enderPad);
+                if (Settings.lightningDestroy) {
+                    if (!GeneralMethods.isVanished(Bukkit.getPlayer(event.getEnderPad().getOwnerUUID()))) {
+                        Location loc = event.getEnderPad().getBukkitLocation();
+                        loc.getWorld().strikeLightningEffect(loc);
                     }
                 }
-
-                Location loc = event.getEnderPad().getLocation();
-                loc.getWorld().strikeLightningEffect(loc);
             }
         }
     }

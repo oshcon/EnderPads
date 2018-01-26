@@ -1,5 +1,6 @@
-package net.doodcraft.oshcon.bukkit.enderpads.api;
+package net.doodcraft.oshcon.bukkit.enderpads.event;
 
+import net.doodcraft.oshcon.bukkit.enderpads.enderpad.EnderPad;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -18,6 +19,10 @@ public class EnderPadUseEvent extends Event implements Cancellable {
         this.entity = entity;
         this.originPad = originPad;
         this.destPad = destPad;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
     public Entity getEntity() {
@@ -41,10 +46,6 @@ public class EnderPadUseEvent extends Event implements Cancellable {
     }
 
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 }

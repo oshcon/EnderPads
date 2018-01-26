@@ -1,6 +1,6 @@
-package net.doodcraft.oshcon.bukkit.enderpads.listeners;
+package net.doodcraft.oshcon.bukkit.enderpads.listener;
 
-import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPadAPI;
+import net.doodcraft.oshcon.bukkit.enderpads.enderpad.EnderPadMethods;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,7 +12,7 @@ public class BlockExplodeListener implements Listener {
     public void onExplode(BlockExplodeEvent event) {
         for (Block block : event.blockList()) {
             if (block.isEmpty()) {
-                EnderPadAPI.destroyCheck(block, null);
+                EnderPadMethods.deleteCheck(null, block, true);
             }
         }
     }

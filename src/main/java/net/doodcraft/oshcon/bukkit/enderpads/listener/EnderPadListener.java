@@ -1,11 +1,10 @@
-package net.doodcraft.oshcon.bukkit.enderpads.listeners;
+package net.doodcraft.oshcon.bukkit.enderpads.listener;
 
 import net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin;
-import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPad;
-import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPadAPI;
-import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPadUseEvent;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
-import net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods;
+import net.doodcraft.oshcon.bukkit.enderpads.enderpad.EnderPad;
+import net.doodcraft.oshcon.bukkit.enderpads.enderpad.SmallLocation;
+import net.doodcraft.oshcon.bukkit.enderpads.event.EnderPadUseEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -26,11 +25,10 @@ public class EnderPadListener implements Listener {
             EnderPad origin = event.getOriginEnderPad();
             EnderPad dest = event.getDestinationEnderPad();
 
-            Location to = dest.getLocation();
+            Location to = dest.getBukkitLocation();
 
             if (!dest.isValid()) {
-                dest.delete(null);
-                EnderPadAPI.teleportEntity(origin, entity);
+                origin.teleportEntity(entity);
                 return;
             }
 
@@ -58,19 +56,18 @@ public class EnderPadListener implements Listener {
             EnderPad origin = event.getOriginEnderPad();
             EnderPad dest = event.getDestinationEnderPad();
 
-            Location from = origin.getLocation();
-            Location to = dest.getLocation();
+            Location from = origin.getBukkitLocation();
+            Location to = dest.getBukkitLocation();
 
             if (!dest.isValid()) {
-                dest.delete(null);
-                EnderPadAPI.teleportEntity(origin, player);
+                origin.teleportEntity(player);
                 return;
             }
 
             EnderPadsPlugin.playerCooldowns.put(player.getName(), System.currentTimeMillis());
 
             if (Settings.logUse || Settings.debug) {
-                StaticMethods.log("&b" + player.getName() + " used an EnderPad: &d" + EnderPadAPI.getLocString(from) + " &b-> &d" + EnderPadAPI.getLocString(to));
+                EnderPadsPlugin.logger.log("&b" + player.getName() + " used an EnderPad: &d" + new SmallLocation(from).toString() + " &b-> &d" + new SmallLocation(to).toString());
             }
 
             to.getChunk().load();
@@ -84,7 +81,7 @@ public class EnderPadListener implements Listener {
                 public void run() {
                     player.teleport(finalTo, PlayerTeleportEvent.TeleportCause.PLUGIN);
                 }
-            }, 1L);
+            }, 0L);
         }
     }
 }

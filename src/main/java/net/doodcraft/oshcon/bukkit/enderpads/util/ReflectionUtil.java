@@ -51,7 +51,7 @@ public class ReflectionUtil {
             Object playerConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
             playerConnection.getClass().getMethod("sendPacket", getNMSClass("Packet")).invoke(playerConnection, packet);
         } catch (Exception ex) {
-            player.sendMessage(StaticMethods.addColor(message));
+            player.sendMessage(EnderPadsPlugin.logger.addColor(message));
             if (Settings.debug) {
                 ex.printStackTrace();
             }
@@ -68,7 +68,7 @@ public class ReflectionUtil {
             Object playerConnection = entityPlayer.getClass().getField("playerConnection").get(entityPlayer);
             playerConnection.getClass().getMethod("sendPacket", getNMSClass("Packet")).invoke(playerConnection, packet);
         } catch (Exception ex) {
-            player.sendMessage(StaticMethods.addColor(message));
+            player.sendMessage(EnderPadsPlugin.logger.addColor(message));
             if (Settings.debug) {
                 ex.printStackTrace();
             }

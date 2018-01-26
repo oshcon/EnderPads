@@ -1,9 +1,10 @@
 package net.doodcraft.oshcon.bukkit.enderpads.config;
 
 import net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin;
-import net.doodcraft.oshcon.bukkit.enderpads.api.EnderPadAPI;
+import net.doodcraft.oshcon.bukkit.enderpads.database.DatabaseManager;
+import net.doodcraft.oshcon.bukkit.enderpads.enderpad.EnderPadMethods;
+import net.doodcraft.oshcon.bukkit.enderpads.event.ConfigurationReloadEvent;
 import net.doodcraft.oshcon.bukkit.enderpads.util.Compatibility;
-import net.doodcraft.oshcon.bukkit.enderpads.util.StaticMethods;
 import org.bukkit.Bukkit;
 
 import java.io.File;
@@ -25,6 +26,7 @@ public class Settings {
     public static int playerCooldown;
     public static boolean teleportMobs;
     public static boolean teleportItems;
+    public static String database;
 
     public static Boolean lightningCreate;
     public static Boolean lightningDestroy;
@@ -109,6 +111,7 @@ public class Settings {
         playerCooldown = 6;
         teleportMobs = true;
         teleportItems = true;
+        database = "flatfile";
 
         lightningCreate = true;
         lightningDestroy = true;
@@ -198,6 +201,7 @@ public class Settings {
         config.add("Blacklist.Worlds", blackListedWorlds);
         config.add("AllowEntities.Mobs", teleportMobs);
         config.add("AllowEntities.Items", teleportItems);
+        config.add("Database.Type", database);
 
         config.add("Effects.Lightning.OnCreate", lightningCreate);
         config.add("Effects.Lightning.OnDestroy", lightningDestroy);
@@ -283,11 +287,12 @@ public class Settings {
         playerCooldown = config.getInteger("Cooldown");
         safeTeleport = config.getBoolean("SkipBlockedPads");
         defaultMax = config.getInteger("DefaultMax");
-        centerMaterial = config.getString("CenterMaterial");
+        centerMaterial = config.getString("CenterMaterial").toUpperCase();
         blackListedBlocks = config.getStringList("Blacklist.Materials");
         blackListedWorlds = config.getStringList("Blacklist.Worlds");
         teleportMobs = config.getBoolean("AllowEntities.Mobs");
         teleportItems = config.getBoolean("AllowEntities.Items");
+        database = config.getString("Database.Type").toUpperCase();
 
         lightningCreate = config.getBoolean("Effects.Lightning.OnCreate");
         lightningDestroy = config.getBoolean("Effects.Lightning.OnDestroy");
@@ -371,7 +376,7 @@ public class Settings {
                 setNewConfigValues(config);
                 setNewLocaleValues(locale);
 
-                EnderPadAPI.verifyAllTelepads();
+                EnderPadMethods.verifyAll();
                 return false;
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -380,7 +385,7 @@ public class Settings {
 
         } else {
 
-            StaticMethods.debug("ConfigurationReloadEvent was cancelled.");
+            EnderPadsPlugin.logger.debug("ConfigurationReloadEvent was cancelled.");
             return false;
         }
     }
@@ -392,7 +397,6 @@ public class Settings {
         Configuration config = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "config.yml");
         Configuration locale = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "locale.yml");
 
-        // 0.3.2-beta, the first config update. Check if General.Version is null to determine if it is needed.
         if (config.getString("General.Version") == null) {
 
             try {
@@ -416,16 +420,20 @@ public class Settings {
                 setNewConfigValues(config);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                StaticMethods.log("&cThere was an error updating your locale to reflect the 0.3.2-beta changes.");
-                StaticMethods.log("&cIf possible, create backups, delete your locale.yml file, then restart.");
+                EnderPadsPlugin.logger.log("&cThere was an error updating your locale to reflect the 0.3.2-beta changes.");
+                EnderPadsPlugin.logger.log("&cIf possible, create backups, delete your locale.yml file, then restart.");
             }
         }
 
         if (!config.getString("General.Version").equals(version)) {
+            EnderPadsPlugin.logger.log("Updating configuration..");
 
-            // Post 0.3.2-beta updates will be performed here.
-            // REMINDER:
-            // Config/Locale updates changes should be kept to a minimum to decrease general confusion for users.
+            // 0.4.0 update
+            // if config version is less than 0.4.0, perform DatabaseManager.update()
+            if (Compatibility.isSupported(config.getString("General.Version"), "0.0.0", "0.3.9")) {
+                DatabaseManager.updateFrom030();
+            }
+
             config.set("General.Version", version);
             config.save();
 
