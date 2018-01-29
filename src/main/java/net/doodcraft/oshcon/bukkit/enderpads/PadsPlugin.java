@@ -1,16 +1,18 @@
 package net.doodcraft.oshcon.bukkit.enderpads;
 
 import de.slikey.effectlib.EffectManager;
+import net.doodcraft.oshcon.bukkit.enderpads.cache.EnderPadCache;
+import net.doodcraft.oshcon.bukkit.enderpads.cache.NameCache;
 import net.doodcraft.oshcon.bukkit.enderpads.cache.PermissionCache;
+import net.doodcraft.oshcon.bukkit.enderpads.cache.UUIDCache;
 import net.doodcraft.oshcon.bukkit.enderpads.command.EnderPadsCommand;
-import net.doodcraft.oshcon.bukkit.enderpads.config.Configuration;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
 import net.doodcraft.oshcon.bukkit.enderpads.database.DatabaseManager;
 import net.doodcraft.oshcon.bukkit.enderpads.database.DatabaseType;
-import net.doodcraft.oshcon.bukkit.enderpads.enderpad.EnderPad;
 import net.doodcraft.oshcon.bukkit.enderpads.enderpad.EnderPadMethods;
 import net.doodcraft.oshcon.bukkit.enderpads.listener.*;
 import net.doodcraft.oshcon.bukkit.enderpads.util.Compatibility;
+import net.doodcraft.oshcon.bukkit.enderpads.util.Effects;
 import net.doodcraft.oshcon.bukkit.enderpads.util.Logger;
 import org.bstats.Metrics;
 import org.bukkit.Bukkit;
@@ -19,44 +21,43 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class EnderPadsPlugin extends JavaPlugin {
+public class PadsPlugin extends JavaPlugin {
 
     public static Plugin plugin;
     public static String version;
     public static Random random;
     public static Logger logger;
+    public static EnderPadCache padCache;
+    public static NameCache nameCache;
+    public static PermissionCache permissionCache;
+    public static UUIDCache uuidCache;
     public static DatabaseManager database;
     public static Metrics metrics;
 
     public static Map<String, Long> playerCooldowns = new HashMap<>();
-    public static Map<String, EnderPad> enderPads = new HashMap<>();
+    public static Map<Integer, Long> entityCooldowns = new HashMap<>();
 
     public static BlockFace faces[] = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
 
-    public static void registerEvents(Plugin plugin, Listener... listeners) {
-        for (Listener listener : listeners) {
-            Bukkit.getServer().getPluginManager().registerEvents(listener, plugin);
-        }
-    }
-
     @Override
     public void onEnable() {
-        version = Bukkit.getBukkitVersion().split("-")[0];
         plugin = this;
+        version = Bukkit.getBukkitVersion().split("-")[0];
         random = new Random();
         logger = new Logger();
-
+        padCache = new EnderPadCache();
+        nameCache = new NameCache();
+        permissionCache = new PermissionCache();
+        uuidCache = new UUIDCache();
+        Effects.effectManager = new EffectManager(plugin);
         Settings.setupDefaults();
-
         if (database == null) {
             database = new DatabaseManager(DatabaseType.valueOf((Settings.database)));
         }
-
         if (Settings.enablePsas) {
             boolean announced = false;
             if (!Compatibility.isSupported(version, "1.7.10", "1.12.2")) {
@@ -72,53 +73,25 @@ public class EnderPadsPlugin extends JavaPlugin {
                 );
                 announced = true;
             }
-
             if (version.equals("1.12")) {
                 logger.log("&c[PSA]: &eThere is a game-breaking bug in 1.12 with the crafting guide. Players can DUPLICATE items without being detected. Consider updating your server NOW.");
                 announced = true;
             }
-
             if (announced) {
                 logger.log("&c[PSA]: You can silence these messages by setting 'General.PublicServiceAnnouncements' in your config to 'false'");
             }
         }
-
         Compatibility.checkHooks();
-
         registerListeners();
         setExecutors();
-
         logger.log("&aEnderPads v" + plugin.getDescription().getVersion() + " is now loaded.");
-
         Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
             @Override
             public void run() {
                 EnderPadMethods.verifyAll();
             }
         }, 1L);
-
-        try {
-            metrics = new Metrics(this);
-            metrics.addCustomChart(new Metrics.SingleLineChart("total_enderpads") {
-                @Override
-                public int getValue() {
-                    Configuration pads = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
-                    return pads.getKeys(false).size();
-                }
-            });
-            metrics.addCustomChart(new Metrics.SingleLineChart("total_combinations") {
-                @Override
-                public int getValue() {
-                    Configuration linked = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "linked.yml");
-                    return linked.getKeys(false).size();
-                }
-            });
-        } catch (Exception ex) {
-            logger.log("&a[METRICS] &cThere was an error sending metrics to bStats.");
-        }
-
-        Effects.effectManager = new EffectManager(plugin);
-        Effects.addAll();
+        metrics();
     }
 
     @Override
@@ -127,21 +100,46 @@ public class EnderPadsPlugin extends JavaPlugin {
         Effects.idleTasks.clear();
     }
 
-    public void registerListeners() {
+    private void registerListeners() {
         registerEvents(plugin, new PlayerListener());
         registerEvents(plugin, new EntityListener());
         registerEvents(plugin, new BlockListener());
         registerEvents(plugin, new EnderPadListener());
         registerEvents(plugin, new Effects());
         registerEvents(plugin, new PermissionCache());
-
         // BlockExplodeEvent was added in 1.8. We still want to support 1.7.10.
         if (!Compatibility.isSupported(version, "0.0.1", "1.7.10")) {
             registerEvents(plugin, new BlockExplodeListener());
         }
     }
 
-    public void setExecutors() {
+    private static void registerEvents(Plugin plugin, Listener... listeners) {
+        for (Listener listener : listeners) {
+            Bukkit.getServer().getPluginManager().registerEvents(listener, plugin);
+        }
+    }
+
+    private void setExecutors() {
         getCommand("enderpads").setExecutor(new EnderPadsCommand());
+    }
+
+    private void metrics() {
+        try {
+            metrics = new Metrics(this);
+            metrics.addCustomChart(new Metrics.SingleLineChart("total_enderpads") {
+                @Override
+                public int getValue() {
+                    return padCache.getCache().size();
+                }
+            });
+            metrics.addCustomChart(new Metrics.SingleLineChart("total_combinations") {
+                @Override
+                public int getValue() {
+                    return padCache.getLinks().size();
+                }
+            });
+        } catch (Exception ex) {
+            logger.log("&a[METRICS] &cThere was an error sending metrics to bStats.");
+        }
     }
 }

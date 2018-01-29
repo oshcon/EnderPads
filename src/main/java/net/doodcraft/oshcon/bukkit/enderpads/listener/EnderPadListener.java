@@ -1,6 +1,6 @@
 package net.doodcraft.oshcon.bukkit.enderpads.listener;
 
-import net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin;
+import net.doodcraft.oshcon.bukkit.enderpads.PadsPlugin;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
 import net.doodcraft.oshcon.bukkit.enderpads.enderpad.EnderPad;
 import net.doodcraft.oshcon.bukkit.enderpads.enderpad.SmallLocation;
@@ -17,29 +17,21 @@ public class EnderPadListener implements Listener {
 
     @EventHandler
     public void onEntityUse(EnderPadUseEvent event) {
-
         if (!(event.getEntity() instanceof Player)) {
-
             final Entity entity = event.getEntity();
-
             EnderPad origin = event.getOriginEnderPad();
             EnderPad dest = event.getDestinationEnderPad();
-
             Location to = dest.getBukkitLocation();
-
             if (!dest.isValid()) {
-                origin.teleportEntity(entity);
+                dest.delete(null);
+                origin.teleportEntity(entity, null);
                 return;
             }
-
-            EntityListener.entityCooldowns.put(entity.getEntityId(), System.currentTimeMillis());
-
+            PadsPlugin.entityCooldowns.put(entity.getEntityId(), System.currentTimeMillis());
             to.setYaw(entity.getLocation().getYaw());
             to.setPitch(entity.getLocation().getPitch());
-
             final Location finalTo = to.add(0, 1, 0);
-
-            Bukkit.getScheduler().runTaskLater(EnderPadsPlugin.plugin, new Runnable() {
+            Bukkit.getScheduler().runTaskLater(PadsPlugin.plugin, new Runnable() {
                 @Override
                 public void run() {
                     entity.teleport(finalTo, PlayerTeleportEvent.TeleportCause.PLUGIN);
@@ -52,36 +44,29 @@ public class EnderPadListener implements Listener {
     public void onPlayerUse(EnderPadUseEvent event) {
         if (event.getEntity() instanceof Player) {
             final Player player = (Player) event.getEntity();
-
             EnderPad origin = event.getOriginEnderPad();
             EnderPad dest = event.getDestinationEnderPad();
-
             Location from = origin.getBukkitLocation();
             Location to = dest.getBukkitLocation();
-
             if (!dest.isValid()) {
-                origin.teleportEntity(player);
+                dest.delete(null);
+                origin.teleportEntity(player, null);
                 return;
             }
-
-            EnderPadsPlugin.playerCooldowns.put(player.getName(), System.currentTimeMillis());
-
+            PadsPlugin.playerCooldowns.put(player.getName(), System.currentTimeMillis());
             if (Settings.logUse || Settings.debug) {
-                EnderPadsPlugin.logger.log("&b" + player.getName() + " used an EnderPad: &d" + new SmallLocation(from).toString() + " &b-> &d" + new SmallLocation(to).toString());
+                PadsPlugin.logger.log("&b" + player.getName() + " used an EnderPad: &d" + new SmallLocation(from).toString() + " &b-> &d" + new SmallLocation(to).toString());
             }
-
             to.getChunk().load();
             to.setYaw(player.getLocation().getYaw());
             to.setPitch(player.getLocation().getPitch());
-
             final Location finalTo = to.add(0, 1, 0);
-
-            Bukkit.getScheduler().runTaskLater(EnderPadsPlugin.plugin, new Runnable() {
+            Bukkit.getScheduler().runTaskLater(PadsPlugin.plugin, new Runnable() {
                 @Override
                 public void run() {
                     player.teleport(finalTo, PlayerTeleportEvent.TeleportCause.PLUGIN);
                 }
-            }, 0L);
+            }, 1L);
         }
     }
 }

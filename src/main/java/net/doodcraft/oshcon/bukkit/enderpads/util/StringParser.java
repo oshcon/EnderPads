@@ -1,11 +1,12 @@
 package net.doodcraft.oshcon.bukkit.enderpads.util;
 
-import net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin;
+import net.doodcraft.oshcon.bukkit.enderpads.PadsPlugin;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
 import net.doodcraft.oshcon.bukkit.enderpads.enderpad.EnderPad;
 import org.bukkit.entity.Player;
 
 public class StringParser {
+
     public static String parse(String string, Player player, EnderPad enderPad, String num, Boolean spelledOut, Boolean online) {
         if (player != null) {
             string = string.replaceAll("<owner>", player.getName());
@@ -28,6 +29,6 @@ public class StringParser {
         }
         string = string.replaceAll("<owner>", num);
         string = string.replaceAll("<prefix>", Settings.pluginPrefix);
-        return EnderPadsPlugin.logger.addColor(string);
+        return PadsPlugin.logger.addColor(string);
     }
 }

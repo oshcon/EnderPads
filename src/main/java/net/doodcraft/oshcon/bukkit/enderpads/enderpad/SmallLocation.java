@@ -5,12 +5,12 @@ import org.bukkit.Location;
 
 public class SmallLocation {
 
-    String world;
-    double x = 0;
-    double y = 0;
-    double z = 0;
-    float yaw = 0;
-    float pitch = 0;
+    private String world;
+    private double x = 0;
+    private double y = 0;
+    private double z = 0;
+    private float yaw = 0;
+    private float pitch = 0;
 
     public SmallLocation(Location location) {
         this.world = location.getWorld().getName();

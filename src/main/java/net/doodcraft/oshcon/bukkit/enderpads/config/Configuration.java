@@ -1,6 +1,6 @@
 package net.doodcraft.oshcon.bukkit.enderpads.config;
 
-import net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin;
+import net.doodcraft.oshcon.bukkit.enderpads.PadsPlugin;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.file.YamlConfigurationOptions;
 
@@ -64,7 +64,7 @@ public class Configuration {
 
         } catch (Exception ex) {
             if (Settings.debug) {
-                EnderPadsPlugin.logger.debug("Error deleting file: " + file.getName());
+                PadsPlugin.logger.debug("Error deleting file: " + file.getName());
                 ex.printStackTrace();
             }
         }

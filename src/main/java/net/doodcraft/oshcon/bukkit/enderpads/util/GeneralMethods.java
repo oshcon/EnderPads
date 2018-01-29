@@ -1,6 +1,6 @@
 package net.doodcraft.oshcon.bukkit.enderpads.util;
 
-import net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin;
+import net.doodcraft.oshcon.bukkit.enderpads.PadsPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -25,7 +25,7 @@ public class GeneralMethods {
             return event.getHand().equals(EquipmentSlot.valueOf("OFF_HAND"));
         }
         // Maintain compatibility with versions prior to the 1.9 combat update.
-        if (Compatibility.isSupported(EnderPadsPlugin.version, "1.9", "2.0")) {
+        if (Compatibility.isSupported(PadsPlugin.version, "1.9", "2.0")) {
             PRE_19 = false;
             return event.getHand().equals(EquipmentSlot.valueOf("OFF_HAND"));
         } else {

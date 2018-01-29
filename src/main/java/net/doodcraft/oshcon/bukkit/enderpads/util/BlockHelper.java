@@ -8,39 +8,33 @@ public class BlockHelper {
     // todo: data values will be removed in 1.13. Find an alternative asap.
 
     // If true, we ignore the data value for the block.
-    public static boolean isDirectional(Material material) {
-
+    private static boolean isDirectional(Material material) {
         for (directionalBlocks value : directionalBlocks.values()) {
             if (material.toString().equals(value.name())) {
                 return true;
             }
         }
-
         return false;
     }
 
     // If true, we ignore the data value for the block and fix the name.
-    public static boolean isDual(Material material) {
-
+    private static boolean isDual(Material material) {
         for (dualBlocks value : dualBlocks.values()) {
             if (material.toString().equals(value.name())) {
                 return true;
             }
         }
-
         return false;
     }
 
     // If true, we need to discriminate the data to keep for the block. Variants should always also be directional.
     // If the block is only a variant (maybe in the future), then we don't need to do anything to it.
-    public static boolean isVariant(Material material) {
-
+    private static boolean isVariant(Material material) {
         for (variantBlocks value : variantBlocks.values()) {
             if (material.toString().equals(value.name())) {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -49,110 +43,81 @@ public class BlockHelper {
     }
 
     public static String fixDual(Block block) {
-
         if (isDual(block.getType())) {
-
             if (block.getType() == Material.GLOWING_REDSTONE_ORE) {
                 return "REDSTONE_ORE";
             }
-
             if (block.getType() == Material.BURNING_FURNACE) {
                 return "FURNACE";
             }
-
             if (block.getType() == Material.REDSTONE_LAMP_ON) {
                 return "REDSTONE_LAMP_OFF";
             }
         }
-
         return block.getType().toString();
     }
 
     public static byte fixVariant(Block block) {
-
         // Check for variant first, then check directional.
-
         if (isVariant(block.getType())) {
-
             if (block.getType() == Material.QUARTZ_BLOCK) {
-
                 if (block.getData() == 0) {
                     return 0;
                 }
-
                 if (block.getData() == 1) {
                     return 1;
                 }
-
                 if (block.getData() >= 2) {
                     return 2;
                 }
-
                 return 0;
             }
-
             if (block.getType() == Material.LOG) {
                 return fixLog(block);
             }
-
             if (block.getType() == Material.LOG_2) {
                 return fixLog(block);
             }
-
             if (block.getType() == Material.HUGE_MUSHROOM_1) {
                 return 0;
             }
-
             if (block.getType() == Material.HUGE_MUSHROOM_2) {
                 return 0;
             }
-
             if (block.getType() == Material.SPONGE) {
                 return 0;
             }
         }
-
         if (isDirectional(block.getType())) {
             return 0;
         }
-
         return block.getData();
     }
 
-    public static byte fixLog(Block block) {
-
+    private static byte fixLog(Block block) {
         byte data = block.getData();
-
         if (block.getType().equals(Material.LOG)) {
-
             if (data == 0 || data == 4 || data == 8) {
                 return 0;
             }
-
             if (data == 1 || data == 5 || data == 9) {
                 return 1;
             }
-
             if (data == 2 || data == 6 || data == 10) {
                 return 2;
             }
-
             if (data == 3 || data == 7 || data == 11) {
                 return 3;
             }
         }
-
         if (block.getType().equals(Material.LOG_2)) {
-
             if (data == 0 || data == 4 || data == 8) {
                 return 0;
             }
-
             if (data == 1 || data == 5 || data == 9) {
                 return 1;
             }
         }
-
         return block.getData();
     }
 

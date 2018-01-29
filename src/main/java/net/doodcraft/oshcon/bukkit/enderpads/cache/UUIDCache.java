@@ -1,26 +1,30 @@
 package net.doodcraft.oshcon.bukkit.enderpads.cache;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class UUIDCache {
 
-    private static HashMap<String, UUID> uuids = new HashMap<>();
+    private Map<String, UUID> uuids;
 
-    public static UUID getUniqueID(String name) {
+    public UUIDCache() {
+        this.uuids = new ConcurrentHashMap<>();
+    }
 
+    @SuppressWarnings("deprecation")
+    public UUID getUniqueID(String name) {
         if (!uuids.containsKey(name)) {
-            uuids.put(name, Bukkit.getOfflinePlayer(name).getUniqueId());
+            Player player = Bukkit.getPlayer(name);
+            if (player != null) {
+                uuids.put(name, player.getUniqueId());
+            } else {
+                uuids.put(name, Bukkit.getOfflinePlayer(name).getUniqueId());
+            }
         }
-
-        if (uuids.get(name) == null) {
-
-            return Bukkit.getOfflinePlayer(name).getUniqueId();
-        } else {
-
-            return uuids.get(name);
-        }
+        return uuids.get(name);
     }
 }

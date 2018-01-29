@@ -1,23 +1,20 @@
 package net.doodcraft.oshcon.bukkit.enderpads.enderpad;
 
-import net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin;
-import net.doodcraft.oshcon.bukkit.enderpads.cache.EnderPadCache;
-import net.doodcraft.oshcon.bukkit.enderpads.cache.LinkCache;
-import net.doodcraft.oshcon.bukkit.enderpads.cache.NameCache;
-import net.doodcraft.oshcon.bukkit.enderpads.cache.PermissionCache;
+import com.sun.istack.internal.Nullable;
+import net.doodcraft.oshcon.bukkit.enderpads.PadsPlugin;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
 import net.doodcraft.oshcon.bukkit.enderpads.event.EnderPadCacheEvent;
 import net.doodcraft.oshcon.bukkit.enderpads.event.EnderPadUseEvent;
 import net.doodcraft.oshcon.bukkit.enderpads.util.BlockHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class EnderPad {
@@ -26,29 +23,12 @@ public class EnderPad {
     private Link link;
     private UUID owner;
 
-    public EnderPad(Location location) {
-        setSmallLocation(new SmallLocation(location));
-        setCurrentLink();
-        setOwnerUUID();
-
-        EnderPadsPlugin.logger.debug("Created new object [" + this.getSmallLocation().toString() + "] by: location");
-    }
-
     public EnderPad(SmallLocation smallLocation) {
         setSmallLocation(smallLocation);
         setCurrentLink();
         setOwnerUUID();
 
-        EnderPadsPlugin.logger.debug("Created new object [" + this.getSmallLocation().toString() + "] by: smallLocation");
-
-    }
-
-    public EnderPad(Location location, UUID uuid) {
-        setSmallLocation(new SmallLocation(location));
-        setCurrentLink();
-        setOwnerUUID(uuid);
-
-        EnderPadsPlugin.logger.debug("Created new object [" + this.getSmallLocation().toString() + "] by: location, uuid");
+        PadsPlugin.logger.debug("Created new object [" + this.getSmallLocation().toString() + "] by: smallLocation");
     }
 
     public EnderPad(SmallLocation smallLocation, UUID uuid) {
@@ -56,7 +36,7 @@ public class EnderPad {
         setCurrentLink();
         setOwnerUUID(uuid);
 
-        EnderPadsPlugin.logger.debug("Created new object [" + this.getSmallLocation().toString() + "] by: smallLocation, uuid");
+        PadsPlugin.logger.debug("Created new object [" + this.getSmallLocation().toString() + "] by: smallLocation, uuid");
     }
 
     public SmallLocation getSmallLocation() {
@@ -80,7 +60,7 @@ public class EnderPad {
     }
 
     public Link getStoredLink() {
-        EnderPad pad = EnderPadCache.getEnderPad(this.smallLocation);
+        EnderPad pad = PadsPlugin.padCache.getEnderPad(this.smallLocation);
         if (pad != null) {
             return pad.getCurrentLink();
         }
@@ -100,38 +80,38 @@ public class EnderPad {
     }
 
     public void setOwnerUUID() {
-        EnderPad pad = EnderPadCache.getEnderPad(this.smallLocation);
+        EnderPad pad = PadsPlugin.padCache.getEnderPad(this.smallLocation);
         if (pad != null) {
-            this.owner = EnderPadCache.getEnderPad(this.getSmallLocation()).getOwnerUUID();
+            this.owner = PadsPlugin.padCache.getEnderPad(this.getSmallLocation()).getOwnerUUID();
         }
     }
 
     public String getOwnerName() {
-        return NameCache.getUsername(this.owner);
+        return PadsPlugin.nameCache.getUsername(this.owner);
     }
 
-    public List getLinks() {
-        return LinkCache.getLinks(this.link);
+    public ArrayList<EnderPad> getLinks() {
+        ArrayList<EnderPad> linked = PadsPlugin.padCache.getLinks(this.link);
+        linked.remove(PadsPlugin.padCache.getEnderPad(this.smallLocation));
+        return linked;
     }
 
     public boolean isCached() {
-        // return if the EnderPad is in EnderPad cache
-        return EnderPadCache.isCached(this.getSmallLocation());
+        // return if the EnderPad is in EnderPad padCache
+        return PadsPlugin.padCache.isCached(this.getSmallLocation());
     }
 
     public boolean isStored() {
         // return if the EnderPad is in the database
-        return EnderPadsPlugin.database.isSaved(this);
+        return PadsPlugin.database.isSaved(this);
     }
 
-    // Come
     public boolean verify() {
         if (!this.isValid()) {
-            EnderPadsPlugin.logger.debug("Deleting object [" + this.getSmallLocation().toString() + "]");
+            PadsPlugin.logger.debug("Deleting object [" + this.getSmallLocation().toString() + "]");
 
-            LinkCache.uncacheLink(this);
-            EnderPadCache.uncache(this);
-            EnderPadsPlugin.database.delete(this);
+            PadsPlugin.padCache.uncache(this);
+            PadsPlugin.database.delete(this);
 
             EnderPadCacheEvent event = new EnderPadCacheEvent(this, false);
             event.setEffects(false);
@@ -139,15 +119,14 @@ public class EnderPad {
             return false;
         } else {
             if (this.isCached()) {
-                EnderPadsPlugin.logger.debug("Ignoring cache for already cached object [" + this.getSmallLocation().toString() + "]");
+                PadsPlugin.logger.debug("Ignoring padCache for already cached object [" + this.getSmallLocation().toString() + "]");
                 return false;
             }
 
-            EnderPadsPlugin.logger.debug("Saving object [" + this.getSmallLocation().toString() + "]");
+            PadsPlugin.logger.debug("Saving object [" + this.getSmallLocation().toString() + "]");
 
-            EnderPadCache.cache(this);
-            LinkCache.cacheLink(this);
-            EnderPadsPlugin.database.save(this);
+            PadsPlugin.padCache.cache(this);
+            PadsPlugin.database.save(this);
 
             EnderPadCacheEvent event = new EnderPadCacheEvent(this, true);
             event.setEffects(false);
@@ -156,16 +135,15 @@ public class EnderPad {
         }
     }
 
-    // This has a purpose, don't shoot me!
     public boolean isValid() {
         return this.validate();
     }
 
-    public boolean validate() {
+    private boolean validate() {
         Block center = this.getBukkitLocation().getBlock();
         if (center.getType().toString().equals(Settings.centerMaterial.split("~")[0])) {
             if (EnderPadMethods.isPlate(center.getRelative(BlockFace.UP).getType())) {
-                for (BlockFace face : EnderPadsPlugin.faces) {
+                for (BlockFace face : PadsPlugin.faces) {
                     Block b = center.getRelative(face);
                     if (b.isEmpty()) {
                         return false;
@@ -190,15 +168,14 @@ public class EnderPad {
 
     public void save(Player player) {
         if (this.isCached()) {
-            EnderPadsPlugin.logger.debug("Ignoring save for already cached object [" + this.getSmallLocation().toString() + "]");
+            PadsPlugin.logger.debug("Ignoring save for already cached object [" + this.getSmallLocation().toString() + "]");
             return;
         }
 
-        EnderPadsPlugin.logger.debug("Saving/caching object [" + this.getSmallLocation().toString() + "]");
+        PadsPlugin.logger.debug("Saving/caching object [" + this.getSmallLocation().toString() + "]");
 
-        EnderPadCache.cache(this);
-        LinkCache.cacheLink(this);
-        EnderPadsPlugin.database.save(this);
+        PadsPlugin.padCache.cache(this);
+        PadsPlugin.database.save(this);
 
         EnderPadCacheEvent event = new EnderPadCacheEvent(this, true);
         event.setCreator(player);
@@ -207,27 +184,29 @@ public class EnderPad {
 
     public void delete(Player player) {
         if (!this.isCached()) {
-            EnderPadsPlugin.logger.debug("Ignoring delete for un-cached object [" + this.getSmallLocation().toString() + "]");
+            PadsPlugin.logger.debug("Ignoring delete for un-cached object [" + this.getSmallLocation().toString() + "]");
             return;
         }
 
-        EnderPadsPlugin.logger.debug("Deleting/un-caching object [" + this.getSmallLocation().toString() + "]");
+        PadsPlugin.logger.debug("Deleting/un-caching object [" + this.getSmallLocation().toString() + "]");
 
-        LinkCache.uncacheLink(this);
-        EnderPadCache.uncache(this);
-        EnderPadsPlugin.database.delete(this);
+        PadsPlugin.padCache.uncache(this);
+        PadsPlugin.database.delete(this);
 
         EnderPadCacheEvent event = new EnderPadCacheEvent(this, false);
         event.setDestroyer(player);
         Bukkit.getPluginManager().callEvent(event);
     }
 
-    // todo: archaic, rewrite soon
-    public void teleportEntity(Entity entity) {
+    public void teleportEntity(Entity entity, @Nullable ArrayList<EnderPad> links) {
         if (entity instanceof Player) {
-            if (!PermissionCache.hasPermission((Player) entity, "enderpads.use", true)) {
+            if (!PadsPlugin.permissionCache.hasPermission((Player) entity, "enderpads.use", true)) {
                 return;
             }
+        }
+
+        if (links == null) {
+            links = this.getLinks();
         }
 
         for (String name : Settings.blackListedWorlds) {
@@ -236,37 +215,28 @@ public class EnderPad {
             }
         }
 
-        List links = this.getLinks();
-        links.remove(this);
-
-        ArrayList<Location> locations = new ArrayList<>();
-
-        for (Object p : links) {
-            Location location = ((EnderPad) p).getBukkitLocation().add(0, 1, 0);
+        for (EnderPad pad : links) {
+            Location location = pad.getBukkitLocation();
             if (Settings.safeTeleport) {
-                Block block = location.getWorld().getBlockAt(((int) location.getX()), ((int) location.getY()) + 2, ((int) location.getZ()));
+                Block block = location.getWorld().getBlockAt(((int) location.getX()), ((int) location.getY()) + 3, ((int) location.getZ()));
                 if (!block.isEmpty()) {
-                    if (!block.getType().isSolid()) {
-                        locations.add(location);
-                    }
-                } else {
-                    locations.add(location);
+                    links.remove(pad);
                 }
-            } else {
-                locations.add(location);
+                if (block.getType().isSolid()) {
+                    links.remove(pad);
+                }
+                if (block.getType().equals(Material.LAVA)) {
+                    links.remove(pad);
+                }
+                if (block.getType().equals(Material.STATIONARY_LAVA)) {
+                    links.remove(pad);
+                }
             }
         }
 
-        if (locations.size() > 0) {
-            Location random = locations.get(EnderPadsPlugin.random.nextInt(locations.size()));
-            EnderPad dest = new EnderPad(random);
-            for (String name : Settings.blackListedWorlds) {
-                if (name.toLowerCase().equals(dest.getBukkitLocation().getWorld().getName().toLowerCase())) {
-                    return;
-                }
-            }
-
-            EnderPadUseEvent useEvent = new EnderPadUseEvent(this, dest, entity);
+        if (links.size() > 0) {
+            EnderPad destination = links.get(PadsPlugin.random.nextInt(links.size()));
+            EnderPadUseEvent useEvent = new EnderPadUseEvent(this, destination, entity);
             Bukkit.getPluginManager().callEvent(useEvent);
         }
     }

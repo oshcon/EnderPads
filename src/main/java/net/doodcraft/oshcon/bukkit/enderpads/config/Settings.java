@@ -1,6 +1,6 @@
 package net.doodcraft.oshcon.bukkit.enderpads.config;
 
-import net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin;
+import net.doodcraft.oshcon.bukkit.enderpads.PadsPlugin;
 import net.doodcraft.oshcon.bukkit.enderpads.database.DatabaseManager;
 import net.doodcraft.oshcon.bukkit.enderpads.enderpad.EnderPadMethods;
 import net.doodcraft.oshcon.bukkit.enderpads.event.ConfigurationReloadEvent;
@@ -125,7 +125,7 @@ public class Settings {
         soundsFrom = true;
         soundsTo = true;
 
-        if (Compatibility.isSupported(EnderPadsPlugin.version, "1.9", "2.0")) {
+        if (Compatibility.isSupported(PadsPlugin.version, "1.9", "2.0")) {
             soundFrom = "ENTITY_ENDERMEN_TELEPORT-1-1.35";
             soundTo = "ENTITY_ENDERMEN_TELEPORT-1-1.45";
         } else {
@@ -186,8 +186,8 @@ public class Settings {
         numbersEighty = "eighty";
         numbersNinety = "ninety";
 
-        Configuration config = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "config.yml");
-        Configuration locale = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "locale.yml");
+        Configuration config = new Configuration(PadsPlugin.plugin.getDataFolder() + File.separator + "config.yml");
+        Configuration locale = new Configuration(PadsPlugin.plugin.getDataFolder() + File.separator + "locale.yml");
 
         config.add("General.ColorfulLogging", colorfulLogging);
         config.add("General.DebugMessages", debug);
@@ -364,14 +364,14 @@ public class Settings {
 
     public static boolean reload() {
 
-        ConfigurationReloadEvent event = new ConfigurationReloadEvent(EnderPadsPlugin.plugin);
+        ConfigurationReloadEvent event = new ConfigurationReloadEvent(PadsPlugin.plugin);
         Bukkit.getPluginManager().callEvent(event);
 
         if (!event.isCancelled()) {
 
             try {
-                Configuration config = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "config.yml");
-                Configuration locale = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "locale.yml");
+                Configuration config = new Configuration(PadsPlugin.plugin.getDataFolder() + File.separator + "config.yml");
+                Configuration locale = new Configuration(PadsPlugin.plugin.getDataFolder() + File.separator + "locale.yml");
 
                 setNewConfigValues(config);
                 setNewLocaleValues(locale);
@@ -385,17 +385,17 @@ public class Settings {
 
         } else {
 
-            EnderPadsPlugin.logger.debug("ConfigurationReloadEvent was cancelled.");
+            PadsPlugin.logger.debug("ConfigurationReloadEvent was cancelled.");
             return false;
         }
     }
 
     private static void update() {
 
-        String version = EnderPadsPlugin.plugin.getDescription().getVersion();
+        String version = PadsPlugin.plugin.getDescription().getVersion();
 
-        Configuration config = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "config.yml");
-        Configuration locale = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "locale.yml");
+        Configuration config = new Configuration(PadsPlugin.plugin.getDataFolder() + File.separator + "config.yml");
+        Configuration locale = new Configuration(PadsPlugin.plugin.getDataFolder() + File.separator + "locale.yml");
 
         if (config.getString("General.Version") == null) {
 
@@ -420,13 +420,13 @@ public class Settings {
                 setNewConfigValues(config);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                EnderPadsPlugin.logger.log("&cThere was an error updating your locale to reflect the 0.3.2-beta changes.");
-                EnderPadsPlugin.logger.log("&cIf possible, create backups, delete your locale.yml file, then restart.");
+                PadsPlugin.logger.log("&cThere was an error updating your locale to reflect the 0.3.2-beta changes.");
+                PadsPlugin.logger.log("&cIf possible, create backups, delete your locale.yml file, then restart.");
             }
         }
 
         if (!config.getString("General.Version").equals(version)) {
-            EnderPadsPlugin.logger.log("Updating configuration..");
+            PadsPlugin.logger.log("Updating configuration..");
 
             // 0.4.0 update
             // if config version is less than 0.4.0, perform DatabaseManager.update()

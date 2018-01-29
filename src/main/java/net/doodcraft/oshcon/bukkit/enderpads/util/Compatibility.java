@@ -1,6 +1,6 @@
 package net.doodcraft.oshcon.bukkit.enderpads.util;
 
-import net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin;
+import net.doodcraft.oshcon.bukkit.enderpads.PadsPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -14,26 +14,20 @@ public class Compatibility {
 
     public static void checkHooks() {
         hooked = new HashMap<>();
-        // Add plugin hooks here.
-        // hookPlugin("blahblahplugin", "1.0", "1.9");
     }
 
     public static boolean isHooked(String name) {
-
         if (hooked.get(name) != null) {
-
             if (getPlugin(name) != null && getPlugin(name).isEnabled()) {
                 return true;
             } else {
-
                 if (!warned.contains(name)) {
                     warned.add(name);
-                    EnderPadsPlugin.logger.log("&c" + name + " is hooked, but not enabled anymore.");
+                    PadsPlugin.logger.log("&c" + name + " is hooked, but not enabled anymore.");
                 }
                 return false;
             }
         }
-
         return false;
     }
 
@@ -42,29 +36,21 @@ public class Compatibility {
     }
 
     public static boolean hookPlugin(String name, String min, String max) {
-
         Plugin hook = Bukkit.getPluginManager().getPlugin(name);
-
         if (hook != null) {
-
             String rawVersion = hook.getDescription().getVersion();
             String[] versionPart = rawVersion.split("\\-");
             String version = versionPart[0];
-
             if (isSupported(version, min, max)) {
-
                 if (!hooked.containsKey(name)) {
                     hooked.put(name, hook);
                     return true;
                 } else {
                     return false;
                 }
-
             } else {
-
-                EnderPadsPlugin.logger.log("&c" + name + " v" + version + " is unknown or unsupported.");
-                EnderPadsPlugin.logger.log("&cAttempting to hook anyway. There may be errors.");
-
+                PadsPlugin.logger.log("&c" + name + " v" + version + " is unknown or unsupported.");
+                PadsPlugin.logger.log("&cAttempting to hook anyway. There may be errors.");
                 try {
                     if (!hooked.containsKey(name)) {
                         hooked.put(name, hook);
@@ -73,16 +59,15 @@ public class Compatibility {
                         return false;
                     }
                 } catch (Exception ex) {
-                    EnderPadsPlugin.logger.log("&cCould not hook into " + name + " v" + version);
-                    EnderPadsPlugin.logger.log("&cThe following stack trace may reveal why:");
-                    EnderPadsPlugin.logger.log(" ");
+                    PadsPlugin.logger.log("&cCould not hook into " + name + " v" + version);
+                    PadsPlugin.logger.log("&cThe following stack trace may reveal why:");
+                    PadsPlugin.logger.log(" ");
                     ex.printStackTrace();
-                    EnderPadsPlugin.logger.log(" ");
+                    PadsPlugin.logger.log(" ");
                     return false;
                 }
             }
         }
-
         return false;
     }
 
@@ -94,7 +79,7 @@ public class Compatibility {
         }
     }
 
-    public static Integer compareVersions(String version, String compareTo) {
+    private static Integer compareVersions(String version, String compareTo) {
         String[] versionString = version.split("\\.");
         String[] compareToString = compareTo.split("\\.");
         int i = 0;

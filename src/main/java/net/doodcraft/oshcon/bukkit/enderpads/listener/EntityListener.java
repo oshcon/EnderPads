@@ -1,6 +1,6 @@
 package net.doodcraft.oshcon.bukkit.enderpads.listener;
 
-import net.doodcraft.oshcon.bukkit.enderpads.cache.EnderPadCache;
+import net.doodcraft.oshcon.bukkit.enderpads.PadsPlugin;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
 import net.doodcraft.oshcon.bukkit.enderpads.enderpad.EnderPad;
 import net.doodcraft.oshcon.bukkit.enderpads.enderpad.EnderPadMethods;
@@ -19,12 +19,7 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class EntityListener implements Listener {
-
-    public static Map<Integer, Long> entityCooldowns = new HashMap<>();
 
     @EventHandler(ignoreCancelled = true)
     public void onChange(EntityChangeBlockEvent event) {
@@ -61,16 +56,16 @@ public class EntityListener implements Listener {
             }
             if (EnderPadMethods.isPlate(type)) {
                 Block centerBlock = event.getBlock().getRelative(BlockFace.DOWN);
-                EnderPad enderPad = EnderPadCache.getEnderPad(new SmallLocation(centerBlock.getLocation()));
+                EnderPad enderPad = PadsPlugin.padCache.getEnderPad(new SmallLocation(centerBlock.getLocation()));
                 if (enderPad != null) {
-                    if (entityCooldowns.containsKey(entity.getEntityId())) {
-                        if ((System.currentTimeMillis() - entityCooldowns.get(entity.getEntityId()) > (Settings.playerCooldown * 1000))) {
+                    if (PadsPlugin.entityCooldowns.containsKey(entity.getEntityId())) {
+                        if ((System.currentTimeMillis() - PadsPlugin.entityCooldowns.get(entity.getEntityId()) > (Settings.playerCooldown * 1000))) {
                             if (entity.getPassengers().size() >= 1) {
                                 for (Entity e : entity.getPassengers()) {
                                     e.eject();
                                 }
                             }
-                            enderPad.teleportEntity(entity);
+                            enderPad.teleportEntity(entity, null);
                         }
                     } else {
                         if (entity.getPassengers().size() >= 1) {
@@ -78,7 +73,7 @@ public class EntityListener implements Listener {
                                 e.eject();
                             }
                         }
-                        enderPad.teleportEntity(entity);
+                        enderPad.teleportEntity(entity, null);
                     }
                 }
             }

@@ -1,7 +1,6 @@
 package net.doodcraft.oshcon.bukkit.enderpads.enderpad;
 
-import net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin;
-import net.doodcraft.oshcon.bukkit.enderpads.cache.EnderPadCache;
+import net.doodcraft.oshcon.bukkit.enderpads.PadsPlugin;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
 import net.doodcraft.oshcon.bukkit.enderpads.util.BlockHelper;
 import net.doodcraft.oshcon.bukkit.enderpads.util.NumberConverter;
@@ -15,30 +14,36 @@ import java.util.ArrayList;
 
 public class EnderPadMethods {
 
-    // This will attempt to verify and cache all stored EnderPads.
+    // This will attempt to verify and padCache all stored EnderPads.
     public static void verifyAll() {
-        EnderPadsPlugin.logger.log("Reading and caching all EnderPads from the database..");
-        int count = 0;
-        for (EnderPad pad : EnderPadsPlugin.database.getStoredPads()) {
-            if (pad.verify()) {
-                count++;
+        ArrayList<EnderPad> pads = PadsPlugin.database.getStoredPads();
+        if (pads.size() > 0) {
+            PadsPlugin.logger.log("Reading and caching all EnderPads from the database..");
+            int count = 0;
+            for (EnderPad pad : pads) {
+                if (pad.verify()) {
+                    count++;
+                }
             }
-        }
-        if (count > 0) {
-            EnderPadsPlugin.logger.log("Cached " + NumberConverter.convert(count) + " EnderPads!");
-        } else {
-            EnderPadsPlugin.logger.log("Couldn't find any EnderPads to cache!");
+            if (count > 0) {
+                PadsPlugin.logger.log("Cached " + NumberConverter.convert(count) + " EnderPads!");
+            }
         }
     }
 
     // todo: Not the most graceful way.
     public static EnderPad getPadFromString(String id) {
         String[] p = id.split("-");
-        return EnderPadCache.getEnderPad(new SmallLocation(p[0], Double.valueOf(p[1]), Double.valueOf(p[2]), Double.valueOf(p[3])));
+        return PadsPlugin.padCache.getEnderPad(new SmallLocation(p[0], Double.valueOf(p[1]), Double.valueOf(p[2]), Double.valueOf(p[3])));
     }
 
     public static EnderPad getPadFromLocation(Location loc) {
-        return EnderPadCache.getEnderPad(loc);
+        SmallLocation smallLoc = new SmallLocation(loc);
+        if (PadsPlugin.padCache.isCached(smallLoc)) {
+            return PadsPlugin.padCache.getEnderPad(loc);
+        } else {
+            return new EnderPad(smallLoc);
+        }
     }
 
     // This will generate an EnderPad friendly string with the block's getData attached.
@@ -47,19 +52,19 @@ public class EnderPadMethods {
     }
 
     // Run this when creating/placing a block. Set save to false to not actually save the EnderPad
-    public static boolean saveCheck(Player player, Block block, boolean save) {
+    public static void saveCheck(Player player, Block block, boolean save) {
         // Player placed a pressure plate. Check the block below, now.
         if (isPlate(block.getType())) {
-            EnderPadsPlugin.logger.debug("Player placed pressure plate.");
+            PadsPlugin.logger.debug("Player placed pressure plate.");
             if (block.getRelative(BlockFace.DOWN).getType().equals(Material.valueOf(Settings.centerMaterial.split("~")[0]))) {
-                EnderPadsPlugin.logger.debug("Pressure plate has valid center material.");
-                EnderPad p = new EnderPad(new SmallLocation(block.getLocation()), player.getUniqueId());
+                PadsPlugin.logger.debug("Pressure plate has valid center material.");
+                EnderPad p = new EnderPad(new SmallLocation(block.getRelative(BlockFace.DOWN).getLocation()), player.getUniqueId());
                 if (p.isValid()) {
-                    EnderPadsPlugin.logger.debug("EnderPad object is valid. Check returns true.");
+                    PadsPlugin.logger.debug("EnderPad object is valid. Check returns true.");
                     if (save) {
                         p.save(player);
                     }
-                    return true;
+                    return;
                 }
             }
         }
@@ -72,45 +77,42 @@ public class EnderPadMethods {
             }
         }
 
-        EnderPadsPlugin.logger.debug("Block did not contain an EnderPad.");
-        return false;
+        PadsPlugin.logger.debug("Block did not contain an EnderPad.");
     }
 
-    public static boolean checkFace(Player player, Block block, boolean save, boolean delete) {
+    public static void checkFace(Player player, Block block, boolean save, boolean delete) {
         if (block.getType().equals(Material.valueOf(Settings.centerMaterial.split("~")[0]))) {
-            EnderPadsPlugin.logger.debug("Center material detected neighboring a block place.");
+            PadsPlugin.logger.debug("Center material detected neighboring a block place.");
             if (isPlate(block.getRelative(BlockFace.UP).getType())) {
-                EnderPadsPlugin.logger.debug("Detected center material has a pressure plate.");
+                PadsPlugin.logger.debug("Detected center material has a pressure plate.");
                 EnderPad p = new EnderPad(new SmallLocation(block.getLocation()), player.getUniqueId());
                 if (p.isValid()) {
-                    EnderPadsPlugin.logger.debug("EnderPad is valid. Check returns true.");
+                    PadsPlugin.logger.debug("EnderPad is valid. Check returns true.");
                     if (save) {
                         p.save(player);
                     }
                     if (delete) {
                         p.delete(player);
                     }
-                    return true;
                 }
             }
         }
-        return false;
     }
 
     // Run this when breaking/changing a block. Set delete to false to not actually delete the EnderPad.
-    public static boolean deleteCheck(Player player, Block block, boolean delete) {
+    public static void deleteCheck(Player player, Block block, boolean delete) {
         // A pressure plate was broken. Check the block below, now.
         if (isPlate(block.getType())) {
-            EnderPadsPlugin.logger.debug("Player broke pressure plate.");
+            PadsPlugin.logger.debug("Player broke pressure plate.");
             if (block.getRelative(BlockFace.DOWN).getType().equals(Material.valueOf(Settings.centerMaterial.split("~")[0]))) {
-                EnderPadsPlugin.logger.debug("Pressure plate has valid center material.");
-                EnderPad p = new EnderPad(new SmallLocation(block.getLocation()), player.getUniqueId());
+                PadsPlugin.logger.debug("Pressure plate has valid center material.");
+                EnderPad p = new EnderPad(new SmallLocation(block.getRelative(BlockFace.DOWN).getLocation()), player.getUniqueId());
                 if (p.isValid()) {
-                    EnderPadsPlugin.logger.debug("EnderPad object is valid. Check returns true.");
+                    PadsPlugin.logger.debug("EnderPad object is valid. Check returns true.");
                     if (delete) {
                         p.delete(player);
                     }
-                    return true;
+                    return;
                 }
             }
         }
@@ -119,11 +121,11 @@ public class EnderPadMethods {
             if (isPlate(block.getRelative(BlockFace.UP).getType())) {
                 EnderPad p = new EnderPad(new SmallLocation(block.getLocation()), player.getUniqueId());
                 if (p.isValid()) {
-                    EnderPadsPlugin.logger.debug("EnderPad object is valid. Check returns true.");
+                    PadsPlugin.logger.debug("EnderPad object is valid. Check returns true.");
                     if (delete) {
                         p.delete(player);
                     }
-                    return true;
+                    return;
                 }
             }
         }
@@ -134,14 +136,13 @@ public class EnderPadMethods {
                 checkFace(player, b, false, delete);
             }
         }
-        EnderPadsPlugin.logger.debug("Block did not contain an EnderPad.");
-        return false;
+        PadsPlugin.logger.debug("Block did not contain an EnderPad.");
     }
 
     // This will check the faces of a specified block, then return an array of blocks suspected of being EnderPads.
     public static ArrayList<Block> fetchFaces(Block block) {
         ArrayList<Block> blocks = new ArrayList<>();
-        for (BlockFace face : EnderPadsPlugin.faces) {
+        for (BlockFace face : PadsPlugin.faces) {
             Block b = block.getRelative(face);
             if (b.getType().toString().equals(Settings.centerMaterial.split("~")[0])) {
                if (isPlate(b.getRelative(BlockFace.UP).getType())) {

@@ -1,6 +1,6 @@
 package net.doodcraft.oshcon.bukkit.enderpads.database;
 
-import net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin;
+import net.doodcraft.oshcon.bukkit.enderpads.PadsPlugin;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Configuration;
 import net.doodcraft.oshcon.bukkit.enderpads.enderpad.EnderPad;
 import net.doodcraft.oshcon.bukkit.enderpads.enderpad.SmallLocation;
@@ -18,28 +18,24 @@ public class DatabaseManager {
     public DatabaseManager(DatabaseType type) {
         this.currentType = type;
         if (type == DatabaseType.FLATFILE) {
-            flat = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "database" + File.separator + "flat.yml");
+            flat = new Configuration(PadsPlugin.plugin.getDataFolder() + File.separator + "database" + File.separator + "flat.yml");
         }
     }
 
-    public boolean save(EnderPad pad) {
+    public void save(EnderPad pad) {
         if (this.currentType == DatabaseType.FLATFILE) {
             String loc = pad.getSmallLocation().toString();
             flat.add(loc + ".Link", pad.getCurrentLink().toString());
             flat.add(loc + ".Owner", pad.getOwnerUUID().toString());
             flat.save();
-            return true;
         }
-        return false;
     }
 
-    public boolean delete(EnderPad pad) {
+    public void delete(EnderPad pad) {
         if (this.currentType == DatabaseType.FLATFILE) {
             flat.remove(pad.getSmallLocation().toString());
             flat.save();
-            return true;
         }
-        return false;
     }
 
     public boolean isSaved(EnderPad pad) {
@@ -72,9 +68,9 @@ public class DatabaseManager {
     }
 
     public static void updateFrom030() {
-        EnderPadsPlugin.logger.log("Importing old EnderPad data...");
-        EnderPadsPlugin.database = new DatabaseManager(DatabaseType.FLATFILE);
-        Configuration old = new Configuration(EnderPadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
+        PadsPlugin.logger.log("Importing old EnderPad data...");
+        PadsPlugin.database = new DatabaseManager(DatabaseType.FLATFILE);
+        Configuration old = new Configuration(PadsPlugin.plugin.getDataFolder() + File.separator + "data" + File.separator + "pads.yml");
         int count = 0;
         for (String k : old.getKeys(false)) {
             String loc = k.replaceAll(" ", ", ");
@@ -83,9 +79,9 @@ public class DatabaseManager {
             count++;
         }
         if (count > 0) {
-            EnderPadsPlugin.logger.log("Successfully imported " + NumberConverter.convert(count) + " EnderPads to the new database!");
+            PadsPlugin.logger.log("Successfully imported " + NumberConverter.convert(count) + " EnderPads to the new database!");
         } else {
-            EnderPadsPlugin.logger.log("Couldn't find any EnderPads to import!");
+            PadsPlugin.logger.log("Couldn't find any EnderPads to import!");
         }
     }
 }

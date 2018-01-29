@@ -2,9 +2,7 @@ name: ${project.artifactId}
 version: ${project.version}
 authors: [oshcon]
 website: http://doodcraft.net/
-main: net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin
-
-commands:
+main: net.doodcraft.oshcon.bukkit.enderpads.PadsPluginmands:
   enderpads:
     description: Base command
 

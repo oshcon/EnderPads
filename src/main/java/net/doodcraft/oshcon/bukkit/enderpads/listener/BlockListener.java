@@ -1,6 +1,6 @@
 package net.doodcraft.oshcon.bukkit.enderpads.listener;
 
-import net.doodcraft.oshcon.bukkit.enderpads.EnderPadsPlugin;
+import net.doodcraft.oshcon.bukkit.enderpads.PadsPlugin;
 import net.doodcraft.oshcon.bukkit.enderpads.enderpad.EnderPadMethods;
 import net.doodcraft.oshcon.bukkit.enderpads.util.Compatibility;
 import org.bukkit.block.Block;
@@ -27,7 +27,7 @@ public class BlockListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onRetract(BlockPistonRetractEvent event) {
         // The addition of slime blocks and their interaction with pistons.
-        if (Compatibility.isSupported(EnderPadsPlugin.version, "1.8", "2.0")) {
+        if (Compatibility.isSupported(PadsPlugin.version, "1.8", "2.0")) {
             for (Block block : event.getBlocks()) {
                 EnderPadMethods.deleteCheck(null, block, true);
             }

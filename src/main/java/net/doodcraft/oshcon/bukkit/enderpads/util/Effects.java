@@ -1,14 +1,13 @@
-package net.doodcraft.oshcon.bukkit.enderpads;
+package net.doodcraft.oshcon.bukkit.enderpads.util;
 
 import de.slikey.effectlib.EffectManager;
 import de.slikey.effectlib.effect.WarpEffect;
 import de.slikey.effectlib.util.ParticleEffect;
+import net.doodcraft.oshcon.bukkit.enderpads.PadsPlugin;
 import net.doodcraft.oshcon.bukkit.enderpads.config.Settings;
 import net.doodcraft.oshcon.bukkit.enderpads.enderpad.EnderPad;
 import net.doodcraft.oshcon.bukkit.enderpads.event.EnderPadCacheEvent;
 import net.doodcraft.oshcon.bukkit.enderpads.event.EnderPadUseEvent;
-import net.doodcraft.oshcon.bukkit.enderpads.util.Compatibility;
-import net.doodcraft.oshcon.bukkit.enderpads.util.GeneralMethods;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -29,7 +28,7 @@ public class Effects implements Listener {
     public static boolean NOFIX_1710 = true;
 
     public static void addAll() {
-        for (EnderPad enderPad : EnderPadsPlugin.enderPads.values()) {
+        for (EnderPad enderPad : PadsPlugin.padCache.getCache().values()) {
             startPoofEffect(enderPad);
         }
     }
@@ -39,7 +38,7 @@ public class Effects implements Listener {
 
             final Location loc = enderPad.getBukkitLocation().add(0.5, 1.15, 0.5);
 
-            int task = Bukkit.getScheduler().scheduleSyncRepeatingTask(EnderPadsPlugin.plugin, new Runnable() {
+            int task = Bukkit.getScheduler().scheduleSyncRepeatingTask(PadsPlugin.plugin, new Runnable() {
                 @Override
                 public void run() {
                     ParticleEffect.PORTAL.display(0, 0, 0, 0.5F, 1, loc, 64);
@@ -80,7 +79,7 @@ public class Effects implements Listener {
 
             if (Settings.potionEffectsEnabled) {
 
-                if (Compatibility.isSupported(EnderPadsPlugin.version, "1.8", "2.0")) {
+                if (Compatibility.isSupported(PadsPlugin.version, "1.8", "2.0")) {
 
                     for (String string : Settings.potionEffects) {
 
@@ -90,8 +89,8 @@ public class Effects implements Listener {
                             PotionEffect effect = new PotionEffect(PotionEffectType.getByName(args[0].toUpperCase()), Integer.valueOf(args[1]) * 20, Integer.valueOf(args[2]), Boolean.valueOf(args[3]), Boolean.valueOf(args[4]));
                             player.addPotionEffect(effect);
                         } catch (Exception ex) {
-                            EnderPadsPlugin.logger.log("Error applying potion effect: " + args[0]);
-                            EnderPadsPlugin.logger.log("Check your configuration for errors.");
+                            PadsPlugin.logger.log("Error applying potion effect: " + args[0]);
+                            PadsPlugin.logger.log("Check your configuration for errors.");
                         }
                     }
 
@@ -100,7 +99,7 @@ public class Effects implements Listener {
                     // todo: Create 1.7.10 add-on addressing incompatibilities
                     // When this problem is addressed, simply set NOFIX_1710 to false
                     if (NOFIX_1710) {
-                        EnderPadsPlugin.logger.log("Sorry, PotionEffects are disabled for your Minecraft version. [Compatible: 1.8 and onward]");
+                        PadsPlugin.logger.log("Sorry, PotionEffects are disabled for your Minecraft version. [Compatible: 1.8 and onward]");
                         Settings.potionEffectsEnabled = false;
                     }
                 }
@@ -134,15 +133,15 @@ public class Effects implements Listener {
                 final String sound[] = Settings.soundFrom.split("-");
 
                 try {
-                    Bukkit.getScheduler().runTaskLater(EnderPadsPlugin.plugin, new Runnable() {
+                    Bukkit.getScheduler().runTaskLater(PadsPlugin.plugin, new Runnable() {
                         @Override
                         public void run() {
                             from.getWorld().playSound(from, Sound.valueOf(sound[0]), Float.valueOf(sound[1]), Float.valueOf(sound[2]));
                         }
                     }, 1L);
                 } catch (Exception ex) {
-                    EnderPadsPlugin.logger.log("&cThere was an error getting the from sound in your config.");
-                    EnderPadsPlugin.logger.log(ex.getLocalizedMessage());
+                    PadsPlugin.logger.log("&cThere was an error getting the from sound in your config.");
+                    PadsPlugin.logger.log(ex.getLocalizedMessage());
                 }
             }
 
@@ -151,15 +150,15 @@ public class Effects implements Listener {
                 final String sound[] = Settings.soundTo.split("-");
 
                 try {
-                    Bukkit.getScheduler().runTaskLater(EnderPadsPlugin.plugin, new Runnable() {
+                    Bukkit.getScheduler().runTaskLater(PadsPlugin.plugin, new Runnable() {
                         @Override
                         public void run() {
                             to.getWorld().playSound(to, Sound.valueOf(sound[0]), Float.valueOf(sound[1]), Float.valueOf(sound[2]));
                         }
                     }, 5L);
                 } catch (Exception ex) {
-                    EnderPadsPlugin.logger.log("&cThere was an error getting the to sound in your config.");
-                    EnderPadsPlugin.logger.log(ex.getLocalizedMessage());
+                    PadsPlugin.logger.log("&cThere was an error getting the to sound in your config.");
+                    PadsPlugin.logger.log(ex.getLocalizedMessage());
                 }
             }
         } else {
